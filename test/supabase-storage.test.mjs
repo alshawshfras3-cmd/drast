@@ -36,6 +36,10 @@ test('legacy service-role JWT remains server-side and is supplied as Bearer',asy
  setup(t,async(_,init)=>{assert.equal(init.headers.get('apikey'),jwt);assert.equal(init.headers.get('authorization'),'Bearer '+jwt);return Response.json([]);});
  delete process.env.SUPABASE_SECRET_KEY;process.env.SUPABASE_SERVICE_ROLE_KEY=jwt;assert.equal(api.storageReady(),true);
  await api.supabaseFetch('/rest/v1/research_jobs');
+ process.env.SUPABASE_SECRET_KEY=jwt;delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+ assert.equal(api.storageReady(),true);await api.supabaseFetch('/rest/v1/research_jobs');
+ process.env.SUPABASE_SECRET_KEY='eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYW5vbiJ9.not-real';
+ assert.equal(api.storageReady(),false);
 });
 test('JSON records survive independent adapter reads and preserve owner-scoped upsert semantics',async t=>{
  const rows=new Map();setup(t,async(url,init)=>{

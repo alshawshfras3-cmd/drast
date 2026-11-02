@@ -3,7 +3,7 @@
 هذا المسار لمشروع Supabase جديد مستقل لدراسات. لا تُنفّذ SQL في مشروع بديهة أو تطبيق آخر. الكود لا ينشئ المشروع ولا يعدّل قاعدة بعيدة تلقائيًا.
 
 1. في المشروع المستقل نفّذ [setup.sql](../supabase/setup.sql) في SQL Editor. يمكن إعادة التنفيذ؛ لا يحذف بيانات الدراسات أو المهام أو الملفات.
-2. على خادم **Vercel / drast فقط** أضف `SUPABASE_URL` بقيمة `https://<project-ref>.supabase.co` و`SUPABASE_SECRET_KEY` بمفتاح `sb_secret_...`. لا تستخدم بادئة `NEXT_PUBLIC_` لمفتاح خدمة. يوجد دعم توافق لـ`SUPABASE_SERVICE_ROLE_KEY` القديم عندما لا تضبط المفتاح الجديد.
+2. على خادم **Vercel / drast فقط** أضف `SUPABASE_URL` بقيمة `https://<project-ref>.supabase.co` و`SUPABASE_SECRET_KEY` بمفتاح `sb_secret_...`. لا تستخدم بادئة `NEXT_PUBLIC_` لمفتاح خدمة. يقبل المتغير أيضًا مفتاح JWT القديم بشرط أن يكون `service_role`، ويدعم الاسم القديم `SUPABASE_SERVICE_ROLE_KEY`. مفاتيح `anon` و`sb_publishable` لا تكفي لهذا المسار الخادمي.
 3. أبقِ Vercel Authentication لجميع عمليات النشر و`DRAST_PRIVATE_WORKSPACE=enabled`. التطبيق مساحة واحدة للمصرح لهم بحماية Vercel؛ لا ينشئ حسابات Supabase Auth ولا تسجيل دخول إضافيًا.
 4. أعد النشر بعد إضافة المتغيرات. وجود المتغيرات يثبت التهيئة فقط. مسار مساحة العمل يتحقق من الجدول والحاوية فعليًا، ويعرض معرّف المشروع دون المفتاح حتى عند فشل الفحص.
 

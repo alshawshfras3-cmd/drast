@@ -17,9 +17,13 @@ function configuration(): SupabaseConfig | null {
   try {
     const url = new URL(rawUrl);
     if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash || !['', '/'].includes(url.pathname)) return null;
-    if (modern && !modern.startsWith('sb_secret_')) return null;
-    if (!modern && (!legacy || !/^eyJ[^.]+\.[^.]+\.[^.]+$/.test(legacy))) return null;
-    return { url: url.origin, key, legacy: !modern };
+    const isOpaqueSecret = key.startsWith('sb_secret_');
+    if (!isOpaqueSecret) {
+      if (!/^eyJ[^.]+\.[^.]+\.[^.]+$/.test(key)) return null;
+      const payload = JSON.parse(Buffer.from(key.split('.')[1], 'base64url').toString('utf8'));
+      if (payload?.role !== 'service_role') return null;
+    }
+    return { url: url.origin, key, legacy: !isOpaqueSecret };
   } catch { return null; }
 }
 
