@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="brand-title">
+  <title id="brand-title">دراسات — البحث المالي</title>
+  <path d="M9 35a4 4 0 0 1 4-4h8v23H13a4 4 0 0 1-4-4V35Z" fill="#A89AF2"/>
+  <path d="M27 24a4 4 0 0 1 4-4h8v34H27V24Z" fill="#7C5FE8"/>
+  <path d="M45 13a4 4 0 0 1 4-4h8v41a4 4 0 0 1-4 4h-8V13Z" fill="#4F2DC1"/>
+  <path d="M14 38h7M32 27h7M50 16h7" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".85"/>
+  <path d="M11 59h44" stroke="#4F2DC1" stroke-width="2" stroke-linecap="round"/>
+  <rect x="31" y="7" width="7" height="7" rx="2" fill="#FF657D"/>
+</svg>

@@ -1,0 +1,192 @@
+{
+  "id": "hmg-2026",
+  "company": "مجموعة الدكتور سليمان الحبيب للخدمات الطبية",
+  "ticker": "4013",
+  "sector": "الرعاية الصحية",
+  "year": 2026,
+  "asOf": "2026-11-02",
+  "status": "draft",
+  "coverage": "الربعان الأول والثاني 2026 موثقان من مصادر تداول المتاحة؛ الربع الثالث قيد التحقق من الأصل.",
+  "sources": [
+    {
+      "id": "hmg-q1",
+      "title": "تداول: النتائج الأولية للحبيب للربع الأول 2026",
+      "url": "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-news/issuer-announcements/issuer-announcements-details?anCat=1&anId=94861&locale=ar",
+      "publishedAt": "2026-05-03",
+      "documentType": "إعلان نتائج أولية",
+      "verification": "الأرقام متاحة في فهرس البحث الرسمي؛ تعذر تنزيل الصفحة مباشرة (403).",
+      "locator": "جدول الربع الحالي والربع المماثل، بمليون ريال"
+    },
+    {
+      "id": "hmg-q2",
+      "title": "تداول: النتائج الأولية للحبيب للنصف الأول والربع الثاني 2026",
+      "url": "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-news/issuer-announcements/issuer-announcements-details/?anCat=18&anId=96969&cs=4013&locale=ar",
+      "publishedAt": "2026-07-26",
+      "documentType": "إعلان نتائج أولية",
+      "verification": "الأرقام وأسباب الإدارة متاحة في فهرس البحث الرسمي؛ تعذر تنزيل الصفحة مباشرة (403).",
+      "locator": "جدول الربع الحالي مستقل عن جدول الفترة التراكمية، بمليون ريال"
+    },
+    {
+      "id": "hmg-profile",
+      "title": "تداول: المعلومات المالية للحبيب (تغطية آخرها 30 يونيو 2026 في النسخة المتاحة)",
+      "url": "https://www.saudiexchange.sa/wps/portal/saudiexchange/hidden/company-profile-main/%21ut/p/z1/jY_dcoJADIWfxSdIRFnoJcoUrfy60yrcOOk2oztFaZcVX7_gVev0L5Obk3xncgIVbKE6Uaf3ZHVzorrXZSV2biDQWfiY-WE4x-J-5S8eMHNQeLD5CqDM3R7Ik0mMa4xQQPUfP_5QAf7tr26QJBJYpEGROZ6LKJ1b4JuIV-CXDJLMNai3W-bRdLz0nVUUyDkKKbz17C5A9BE2htvmbBTDes82IX1Km-NZJWRe2YZsSdctFIrUgWPuuM5pzyCH47q9kFWHWLdWcs3K8guUaTas2l41JidDR7ZsoByGOyjH3lSgEI7ru5PJMLP0XPOT5ssndjwsDL-fubVxo6hmKPtP3o6PW9R5l8xSt-s7CUajD4y5bA0%21/dz/d5/L0lHSklKSUtVS1VKQ2dwUkNTQ2lDbEVLSUtVU0ovWUJZRUFBSU1FQUFBRUVNQ0tJTUFHRUdPRU9FQkpGSkZCSk1OTkRETERMTkRISFBIUE5IQ0FvTUVBQSEhLzRKQ2lqSzJNWEhFSUpTWkNrbW9wektOTmJzWmJXYWptdDJNdHRWUlNxb3FRL1o3XzVBNjAySDgwTzBWQzQwNjBPNEdNTDgxRzU1L1o2XzVBNjAySDgwT0dGMkUwUUY5QlFERUcxMEs0L3ZpZXcvbm9ybWFsL2xhbmcvZW4vZ2xvYmFsL2h0dHA6JTAlMHRhZGF3dWwlMC9jb21wYW55U3ltYm9sLzQwMTM%21/?locale=en",
+      "publishedAt": null,
+      "documentType": "معلومات مالية منشورة",
+      "verification": "تمت قراءة جدول التدفقات والنقد؛ جميع الأرقام الأصلية بالألف وحولت إلى المليون بالقسمة على 1000.",
+      "locator": "Financials > Quarterly > Cash Flows، الأعمدة 2026-06-30 و2026-03-31؛ التدفقات تراكمية",
+      "checkedAt": "2026-11-02"
+    },
+    {
+      "id": "hmg-q1-factsheet",
+      "title": "تداول: نشرة المستثمرين للربع الأول 2026",
+      "url": "https://www.saudiexchange.sa/Resources/fsPdf/8578_1601_2026-05-02_16-21-23_en.pdf",
+      "publishedAt": "2026-05-03",
+      "documentType": "نشرة مستثمرين",
+      "verification": "فهرس PDF الرسمي؛ الأرقام تقريبية إلى أقرب مليون"
+    },
+    {
+      "id": "hmg-q2-factsheet",
+      "title": "تداول: نشرة المستثمرين للربع الثاني 2026",
+      "url": "https://www.saudiexchange.sa/Resources/fsPdf/8578_1601_2026-07-23_19-07-28_ar.pdf",
+      "publishedAt": "2026-07-26",
+      "documentType": "نشرة مستثمرين",
+      "verification": "فهرس PDF الرسمي؛ الأرقام تقريبية إلى أقرب مليون"
+    },
+    {
+      "id": "hmg-q3-pending",
+      "title": "رابط إعلان الربع الثالث 2026 — يحتاج فتح المصدر الرسمي للتحقق",
+      "url": "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-news/issuer-announcements/issuer-announcements-details/?anCat=1&anId=98673&cs=4013&locale=ar",
+      "publishedAt": "2026-10-25",
+      "documentType": "إعلان نتائج أولية — غير متحقق المحتوى",
+      "verification": "تم العثور على معرف الإعلان عبر فهارس خارجية؛ تعذر قراءة محتواه من تداول أو الشركة، ولم تعتمد منه أرقام.",
+      "verificationStatus": "pending"
+    }
+  ],
+  "quarters": [
+    {
+      "period": "2026-Q1",
+      "revenue": 3435.76,
+      "grossProfit": 955.97,
+      "operatingProfit": 587.75,
+      "netProfit": 503.29,
+      "operatingCashFlow": 1054.824,
+      "cash": 2415.363,
+      "totalDebt": null,
+      "previousYearRevenue": 3157.78,
+      "previousYearNetProfit": 557.01,
+      "sourceId": "hmg-q1",
+      "unit": "SAR_million",
+      "operatingCashFlowYtd": 1054.824,
+      "operatingCashFlowBasis": "reported_ytd_equals_quarter",
+      "fieldSources": {
+        "operatingCashFlow": "hmg-profile",
+        "cash": "hmg-profile"
+      },
+      "evidence": {
+        "income": "جدول الربع الحالي: الإيرادات وإجمالي الربح والربح التشغيلي وصافي الربح العائد لمساهمي المصدر.",
+        "operatingCashFlow": "1,054,824 ألف ريال للثلاثة أشهر، قسمت على 1000.",
+        "cash": "2,415,363 ألف ريال رصيد نهاية 31 مارس، قسمت على 1000."
+      }
+    },
+    {
+      "period": "2026-Q2",
+      "revenue": 4006.45,
+      "grossProfit": 1222.01,
+      "operatingProfit": 770.41,
+      "netProfit": 662.66,
+      "operatingCashFlow": 777.666,
+      "cash": 2322.207,
+      "totalDebt": null,
+      "previousYearRevenue": 3384.33,
+      "previousYearNetProfit": 591.02,
+      "sourceId": "hmg-q2",
+      "unit": "SAR_million",
+      "operatingCashFlowYtd": 1832.49,
+      "operatingCashFlowBasis": "derived_quarter_from_ytd",
+      "fieldSources": {
+        "operatingCashFlow": "hmg-profile",
+        "cash": "hmg-profile"
+      },
+      "evidence": {
+        "income": "جدول الربع الحالي في إعلان الستة أشهر، وليس جدول الفترة التراكمية.",
+        "operatingCashFlow": "(1,832,490 - 1,054,824) ألف ريال / 1000 = 777.666 مليون للربع الثاني.",
+        "cash": "2,322,207 ألف ريال رصيد نهاية 30 يونيو، قسمت على 1000."
+      }
+    },
+    {
+      "period": "2026-Q3",
+      "revenue": null,
+      "grossProfit": null,
+      "operatingProfit": null,
+      "netProfit": null,
+      "operatingCashFlow": null,
+      "cash": null,
+      "totalDebt": null,
+      "previousYearRevenue": null,
+      "previousYearNetProfit": null,
+      "sourceId": "hmg-q3-pending",
+      "unit": "SAR_million",
+      "verificationStatus": "pending_primary_source"
+    }
+  ],
+  "findings": [
+    {
+      "kind": "fact",
+      "title": "تعافٍ ربعي في الإيرادات والربح خلال الربع الثاني",
+      "body": "الإيرادات انتقلت من 3,435.76 إلى 4,006.45 مليون ريال، وصافي الربح العائد لمساهمي المصدر من 503.29 إلى 662.66 مليون. الأرقام تخص كل ربع مستقل.",
+      "sourceIds": [
+        "hmg-q1",
+        "hmg-q2"
+      ]
+    },
+    {
+      "kind": "analysis",
+      "title": "تحسن الهامش عن الربع الأول مع بقاء ضغط سنوي",
+      "body": "هامش صافي الربح المحسوب ارتفع من نحو 14.65% في الربع الأول إلى 16.54% في الثاني؛ لكنه أقل من نحو 17.46% في الربع المماثل 2025. تحسن الأرباح عن الربع السابق لا يعني استعادة الهامش السنوي بالكامل.",
+      "sourceIds": [
+        "hmg-q1",
+        "hmg-q2"
+      ]
+    },
+    {
+      "kind": "management",
+      "title": "الإدارة تربط نمو الإيرادات بالنشاط والطاقة المضافة",
+      "body": "وفق تفسير الشركة للربع الثاني، دعمت زيادة المراجعين والإشغال ونمو مساهمة المستشفيات الحديثة قطاعات المستشفيات والصيدليات والحلول. هذا تفسير الإدارة؛ لم تتحقق الدراسة مستقلاً من أعداد المرضى والإشغال.",
+      "sourceIds": [
+        "hmg-q2"
+      ]
+    },
+    {
+      "kind": "fact",
+      "title": "تدفق تشغيلي موجب؛ قيمة الربع الثاني مشتقة",
+      "body": "بلغ التدفق التشغيلي التراكمي للنصف الأول 1,832.490 مليون ريال مقابل 1,054.824 مليون للربع الأول؛ الفرق 777.666 مليون يمثل الربع الثاني. النقد بنهاية يونيو 2,322.207 مليون.",
+      "sourceIds": [
+        "hmg-profile"
+      ]
+    },
+    {
+      "kind": "analysis",
+      "title": "الحكم النهائي على جودة الأرباح والتمويل مؤجل",
+      "body": "يلزم فحص القوائم الكاملة والإيضاحات للتحصيل والإنفاق الرأسمالي والقروض والتزامات الإيجار، ثم توثيق الربع الثالث؛ البيانات المتاحة لا تكفي لتقييم الملاءة أو تسعير السهم.",
+      "sourceIds": [
+        "hmg-q1",
+        "hmg-q2",
+        "hmg-profile"
+      ]
+    }
+  ],
+  "limitations": [
+    "هذه مسودة تحليل أداء وليست دراسة مالية مكتملة أو توصية شراء أو بيع.",
+    "إعلان الربع الثالث 2026 ظهر في فهارس خارجية بالمعرف 98673، لكن تعذر التحقق من محتواه مباشرة في تداول أو موقع الشركة؛ لذلك تركت أرقامه null، ولا تعني أنها صفر أو أن الشركة لم تعلن.",
+    "لم تتم قراءة القوائم الكاملة والإيضاحات لعام 2026 من نطاق تداول أو الشركة؛ إجمالي الدين غير معتمد، ولم يستخدم إجمالي المطلوبات بديلاً عنه.",
+    "أرقام قائمة الدخل مصدرها إعلانات النتائج بمليون ريال ودقة منزلتين؛ بيانات النقد والتدفق مصدرها ملف الشركة الرسمي بالألف وحولت إلى المليون، وقد تنتج فروق تقريب محدودة عند المطابقة.",
+    "المعلومات المالية المعروضة في صفحة تداول متاحة حتى 30 يونيو في النسخة المقروءة؛ تاريخ القطع 2 نوفمبر 2026 لا يعني اكتمال جميع إفصاحات ذلك التاريخ.",
+    "لا توجد مقارنة أقران أو تقييم سعري أو توقعات، ولم تستكمل مراجعة الاستحواذات والبنود غير المتكررة والأحداث اللاحقة."
+  ],
+  "nextWatch": [
+    "قراءة إعلان الربع الثالث والقوائم الكاملة من المصدر الرسمي وإكمال الصف الناقص.",
+    "مطابقة أرقام الإعلان مع القوائم الموحدة والإيضاحات، مع تسجيل أي فروق تقريب أو إعادة عرض.",
+    "متابعة هامش الربح الصافي والتشغيلي ومساهمة المستشفيات الحديثة مع مؤشرات الإشغال إن أفصحت الشركة عنها.",
+    "تحليل الذمم والتحصيل والإنفاق الرأسمالي وجدول استحقاق القروض والإيجارات قبل الحكم على جودة الأرباح والسيولة."
+  ]
+}
