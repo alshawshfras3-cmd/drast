@@ -18,8 +18,8 @@ function pdfFixture() {
   return parts.join('');
 }
 
-test('only the five pilot companies and exact approved HTTPS hosts are accepted', () => {
-  assert.deepEqual(PILOT_COMPANIES.map(item => item.id), ['hmg', 'aramco', 'sabic', 'stc', 'almarai']);
+test('only the eight watchlist entities and exact approved HTTPS hosts are accepted', () => {
+  assert.deepEqual(PILOT_COMPANIES.map(item => item.id), ['hmg', 'aramco', 'sabic', 'stc', 'almarai', 'baan', 'kafd', 'humain']);
   const company = getPilotCompany('hmg');
   for (const url of ['http://hmg.com/report.pdf', 'https://hmg.com.evil.test/report.pdf', 'https://hmg.com@127.0.0.1/a', 'https://user:pass@hmg.com/a', 'https://hmg.com:8443/a', 'file:///etc/passwd', 'https://127.0.0.1/a']) {
     assert.throws(() => validateSourceUrl(url, company));
@@ -27,6 +27,8 @@ test('only the five pilot companies and exact approved HTTPS hosts are accepted'
   }
   assert.equal(validateSourceUrl('https://hmg.com/report.pdf#page=1', company), 'https://hmg.com/report.pdf');
   assert.equal(isAllowedCompanySourceUrl('almarai', 'https://almmedia.almarai.com/FinancialReports/example.pdf'), true);
+  assert.equal(isAllowedCompanySourceUrl('baan', 'https://www.saudiexchange.sa/Resources/fsPdf/report.pdf'), true);
+  assert.equal(isAllowedCompanySourceUrl('hmg', 'https://alhokair.argaam-ir.com/report.pdf'), false);
 });
 
 test('unknown companies cannot cause even one fetch', async () => {

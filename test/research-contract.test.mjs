@@ -35,6 +35,16 @@ test('request has a bounded known scope and does not coerce unsupported types', 
   throwsCode(() => normalizeResearchRequest({companyIds:['hmg'], question:'x'.repeat(2001)}), 'INVALID_TEXT_LENGTH');
 });
 
+test('unlisted projects use strategic scope without inventing listed financial results', () => {
+  throwsCode(() => normalizeResearchRequest({companyIds:['kafd'], type:'results'}), 'INVALID_RESEARCH_TYPE');
+  throwsCode(() => normalizeResearchRequest({companyIds:['humain'], type:'results'}), 'INVALID_RESEARCH_TYPE');
+  const input = {companyIds:['humain'],type:'event',question:'راجع الاستراتيجية والمستهدفات',evidence:[evidence({id:'humain-source',companyId:'humain',url:'https://www.pif.gov.sa/en/our-investments/our-portfolio/humain/'})]};
+  assert.equal(createSourcesOnlyReport(input).sections.length, 1);
+  const prompt = buildResearchPrompt(input);
+  assert.match(prompt, /private_company/);
+  assert.match(prompt, /الإيرادات والإنفاق الفعلي/);
+});
+
 test('evidence contract keeps coverage metadata without making a verification claim', () => {
   const input = evidence({truncated:false, approved:true, revenue:1234});
   const result = validateEvidence([input], ['hmg'])[0];

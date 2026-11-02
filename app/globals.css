@@ -754,3 +754,27 @@ tbody th,thead th{font-size:13px;color:#63516f}
 @media(max-width:760px) { .app-header { padding: 9px 16px 7px; } .app-header .header-inner { border-radius: 14px; min-height: 68px; padding: 10px 12px; } .workspace-hero.research-hero { grid-template-columns: 1fr; padding: 27px 25px 0; gap: 12px; min-height: auto; } .research-hero .hero-copy { max-width: 100%; } .research-hero .hero-title { font-size: 34px; } .research-hero .hero-description { font-size: 12px; max-width: 440px; } .research-hero .hero-visual { display: none; } .research-hero .hero-actions .btn { font-size: 11px; padding: 9px 13px; min-height: 41px; } .research-banner-meta { gap: 10px; padding: 14px 0; margin-top: 8px; } .research-banner-meta > span { grid-template-columns: 17px 1fr; gap: 5px; } .research-banner-meta strong { font-size: 10px; } .research-banner-meta small { font-size: 8px; } .research-banner-meta svg { width: 14px; height: 14px; } }
 @media(max-width:400px) { .workspace-hero.research-hero { padding: 23px 19px 0; } .research-hero .hero-title { font-size: 30px; } .research-banner-meta small { display: none; } .research-banner-meta strong { font-size: 9px; } }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior: auto; } .app-header { transition: none !important; transform: none !important; } }
+
+/* Institutional research references are an explicitly manual directory. */
+.institution-directory { margin-top: 32px; padding: 27px; border: 1px solid #e7dfef; border-radius: 19px; background: #f8f5fd; }
+.institution-directory-heading { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+.institution-directory-heading .section-kicker { margin-bottom: 4px; font-size: 10px; color: #9279ad; }
+.institution-directory-heading h2 { color: #513767; font-size: 23px; }
+.institution-directory-status { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid #e7ddef; border-radius: 7px; padding: 6px 9px; color: #826d94; font-size: 10px; }
+.institution-directory-description { max-width: 800px; color: #7d688c; font-size: 12px; line-height: 2; margin-top: 12px; }
+.institution-directory-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; margin-top: 23px; }
+.institution-card { padding: 22px; border: 1px solid #e9e0f0; background: #fff; border-radius: 14px; display: flex; flex-direction: column; min-width: 0; }
+.institution-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 17px; }
+.institution-card-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; color: #8966b1; background: #f1eafa; }
+.institution-card.mint .institution-card-icon { color: #5b927b; background: #eaf5ee; }
+.institution-card.sky .institution-card-icon { color: #6b8db0; background: #eaf2fb; }
+.institution-card-category { color: #9c86b0; font-size: 9px; background: #faf6fe; border: 1px solid #f0e8f7; padding: 3px 7px; border-radius: 5px; }
+.institution-card h3 { font-size: 18px; color: #624677; margin-bottom: 5px; }
+.institution-card > p { color: #887293; font-size: 12px; }
+.institution-card-access { display: flex; align-items: flex-start; gap: 6px; color: #927d9e; font-size: 10px; line-height: 1.9; margin: 20px 0; }
+.institution-card-access > svg { margin-top: 3px; }
+.institution-card > a { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 13px; border-top: 1px solid #eee7f4; color: #785692; font-size: 11px; }
+.institution-card > a:hover { color: var(--purple); text-decoration: none; }
+.research-desk .rd-scope > div { grid-template-columns: repeat(auto-fit,minmax(155px,1fr)); }
+@media(max-width:900px) { .institution-directory { padding: 23px; } .institution-directory-grid { gap: 13px; } .institution-card { padding: 18px; } .institution-card-top { flex-direction: column; align-items: flex-start; gap: 10px; } .institution-card h3 { font-size: 17px; } }
+@media(max-width:650px) { .institution-directory { padding: 20px; margin-top: 25px; border-radius: 15px; } .institution-directory-heading { align-items: flex-start; flex-direction: column; gap: 12px; } .institution-directory-heading h2 { font-size: 21px; } .institution-directory-status { font-size: 9px; padding: 5px 7px; } .institution-directory-description { font-size: 11px; } .institution-directory-grid { grid-template-columns: 1fr; gap: 13px; margin-top: 19px; } .institution-card { padding: 20px; } .institution-card-top { flex-direction: row; align-items: center; margin-bottom: 14px; } .institution-card-access { margin: 16px 0; } .research-desk .rd-scope > div { grid-template-columns: repeat(2,minmax(0,1fr)); } }

@@ -1,4 +1,5 @@
 import hmg from '@/data/hmg.json';
+import baan from '@/data/baan.json';
 
 // Watchlist entries are empty research dossiers, never invented financial results.
 const watchlist = [
@@ -9,6 +10,7 @@ const watchlist = [
 ];
 export const seedStudies:any[] = [
   {...hmg, researchCompanyId:'hmg'},
+  baan,
   ...watchlist.map(({url,...company}) => ({
     ...company, id:`${company.researchCompanyId}-watchlist`, year:2026, asOf:'2026-11-02', status:'draft',
     coverage:'ملف متابعة جديد. شغّل مهمة بحث لجمع المصادر؛ لم تُعتمد أرقام مالية لهذه الشركة بعد.',
