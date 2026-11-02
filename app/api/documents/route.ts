@@ -1,9 +1,11 @@
 import { actor, response, originAllowed, readDocument, readFile, saveDocument } from '@/lib/repository';
+import { storageReady, STORAGE_MESSAGE, readBoundedRequestText, SupabaseStorageError } from '@/lib/supabase-storage';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   const owner = actor(request);
   if (!owner) return response({ error: 'يلزم الدخول إلى المساحة المحمية.' }, 401);
+  if (!storageReady()) return response({error:STORAGE_MESSAGE},503);
   const url = new URL(request.url), id = url.searchParams.get('id');
   if (!id) return response({ error: 'حدد المستند.' }, 400);
   try {
@@ -24,10 +26,9 @@ export async function POST(request: Request) {
   const owner = actor(request);
   if (!owner) return response({ error: 'يلزم الدخول إلى المساحة المحمية.' },401);
   if (!originAllowed(request)) return response({ error: 'مصدر الطلب غير مسموح.' },403);
-  if (Number(request.headers.get('content-length') || 0) > 4 * 1024 * 1024) return response({ error: 'بيانات التقرير كبيرة جدًا.' },413);
+  if (!storageReady()) return response({error:STORAGE_MESSAGE},503);
   try {
-    const body = await request.text();
-    if (new TextEncoder().encode(body).length > 4 * 1024 * 1024) return response({ error: 'بيانات التقرير كبيرة جدًا.' },413);
+    const body = await readBoundedRequestText(request,4 * 1024 * 1024);
     return response(await saveDocument(owner, JSON.parse(body)));
-  } catch(e) { return response({ error: e instanceof Error ? e.message : 'تعذّر حفظ التقرير.' },400); }
+  } catch(e) { return response({ error: e instanceof Error ? e.message : 'تعذّر حفظ التقرير.' },e instanceof SupabaseStorageError ? e.status : 400); }
 }

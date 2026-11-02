@@ -1,5 +1,5 @@
 import { seedStudies } from './seeds';
-import { storage } from './blob-storage';
+import { storage } from './supabase-storage';
 import { createRepository } from './repository-core.mjs';
 import { workspaceActor, sameOrigin } from './access-policy.mjs';
 export const actor = (request: Request): string | null => workspaceActor(request);

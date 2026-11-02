@@ -90,7 +90,7 @@ button, input, select, textarea { font-family: 'IBM Plex Sans Arabic', Tahoma, A
 .workspace .hero-doc.front .hero-chart::before { background-image: linear-gradient(#dce2e855 1px,transparent 1px),linear-gradient(90deg,#dce2e855 1px,transparent 1px); }
 .workspace .hero-bars > span { background: #a8c8bd; }
 .workspace .hero-bars > span:nth-child(2n) { background: #ced8e4; }
-.workspace .hero-doc .hero-chart > svg { color: var(--drast-positive); }
+.workspace .hero-doc .hero-chart > svg { color: var(--drast-positive); background: transparent; }
 .workspace .hero-doc .hero-chart > svg circle { fill: var(--drast-positive); }
 .workspace .hero-insight { background: #fff; border-color: var(--drast-line); box-shadow: 0 7px 18px #17212b07; }
 .workspace .hero-insight > span { color: var(--drast-positive); background: var(--drast-positive-bg); }

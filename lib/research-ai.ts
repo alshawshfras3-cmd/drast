@@ -15,12 +15,17 @@ export async function draftResearch(input: any) {
   const config = researchProviderStatus();
   if (!config.configured) return { report: createSourcesOnlyReport(input), mode: 'sources_only', model: null };
   const selectedEvidence = preparePromptEvidence(input.evidence, input.companyIds);
-  if (config.provider === 'Vercel AI Gateway') {
-    const generated = await generateVercelFreeText(buildResearchPrompt({ ...input, evidence: selectedEvidence }));
-    const report = validateResearchReport(parseReportJson(generated.text), selectedEvidence, { companyIds: input.companyIds });
-    report.limitations = [...new Set([...report.limitations, ...(input.issues || [])])];
-    return { report, mode: 'ai', model: generated.model, provider: generated.provider, cost: generated.cost };
-  }
+  const generated = await generateResearchText(buildResearchPrompt({ ...input, evidence: selectedEvidence }));
+  const report = validateResearchReport(parseReportJson(generated.text), selectedEvidence, { companyIds: input.companyIds });
+  report.limitations = [...new Set([...report.limitations, ...(input.issues || [])])];
+  return { report, mode: 'ai', model: generated.model, provider: generated.provider, cost: generated.cost };
+}
+
+/** The connection test and real drafts use exactly the same configured route. */
+export async function generateResearchText(prompt: string, maxOutputTokens = 3200) {
+  const config = researchProviderStatus();
+  if (!config.configured) throw new Error('MODEL_NOT_CONFIGURED');
+  if (config.provider === 'Vercel AI Gateway') return generateVercelFreeText(prompt, maxOutputTokens);
   let actualModel = config.model;
   const provider = createOpenAICompatible({
     name: 'openrouter', baseURL: 'https://openrouter.ai/api/v1',
@@ -38,13 +43,11 @@ export async function draftResearch(input: any) {
     },
   });
   const result = await generateText({
-    model: provider.chatModel(config.model), prompt: buildResearchPrompt({ ...input, evidence: selectedEvidence }),
-    maxOutputTokens: 3200, maxRetries: 0, abortSignal: AbortSignal.timeout(50_000),
+    model: provider.chatModel(config.model), prompt,
+    maxOutputTokens, maxRetries: 0, abortSignal: AbortSignal.timeout(50_000),
   });
   if (result.finishReason === 'length') throw new Error('REPORT_TRUNCATED');
-  const report = validateResearchReport(parseReportJson(result.text), selectedEvidence, { companyIds: input.companyIds });
-  report.limitations = [...new Set([...report.limitations, ...(input.issues || [])])];
-  return { report, mode: 'ai', model: actualModel };
+  return { text: result.text, model: actualModel, provider: 'OpenRouter', cost: null };
 }
 
 // Do not expose upstream response bodies, prompts or credentials in errors.
@@ -54,7 +57,7 @@ export function researchError(error: unknown): { message: string; status: number
   if (diagnostic.includes('customer_verification_required')) return { status: 503, message: 'يتطلب حساب Vercel اعتماد الوصول إلى AI Gateway قبل تشغيل النموذج. لم تُفعّل مدفوعات أو تعبئة رصيد تلقائية.' };
   const code = (error as any)?.statusCode;
   if (code === 429) return { status: 429, message: 'بلغ النموذج المجاني حد الاستخدام أو تعذر توفره مؤقتًا. حُفظت المصادر؛ أعد المحاولة لاحقًا. لن ينتقل النظام إلى نموذج مدفوع.' };
-  if (code === 401 || code === 403 || diagnostic.includes('VERCEL_OIDC_MISSING')) return { status: 503, message: 'تعذر اعتماد الاتصال بالنموذج لهذا المشروع. راجع هوية Vercel للمشروع أو مفتاحه المخصص.' };
+  if (code === 401 || code === 403 || diagnostic.includes('VERCEL_OIDC_MISSING') || diagnostic.includes('MODEL_NOT_CONFIGURED')) return { status: 503, message: 'تعذر اعتماد الاتصال بالنموذج لهذا المشروع. راجع هوية Vercel للمشروع أو أضف مفتاح OpenRouter مخصصًا في إعدادات الاستضافة.' };
   if (code === 402 || code === 404 || code === 502 || code === 503) return { status: 503, message: 'لا يتوفر مسار مجاني مناسب الآن. حُفظت المصادر ولم يُستخدم بديل مدفوع.' };
   if ((error as any)?.name === 'TimeoutError' || (error as any)?.name === 'AbortError') return { status: 504, message: 'انتهت مهلة النموذج. المصادر محفوظة ويمكن استئناف الصياغة.' };
   return { status: 422, message: 'لم يجتز التقرير فحص البنية أو الاستشهادات أو اكتمل الرد بصورة غير صالحة. راجع المصادر وأعد الصياغة؛ لا تعتمد هذه المحاولة كتقرير.' };

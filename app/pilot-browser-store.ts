@@ -1,6 +1,6 @@
 import { isAllowedCompanySourceUrl } from '@/lib/pilot-catalog.mjs';
 
-/** Browser-only research records. This database is isolated from other projects. */
+/** Local research cache. Optional cloud transfers use the private server API. */
 export type ResearchType = 'results' | 'event' | 'sector';
 export type TaskStatus = 'queued' | 'collecting' | 'drafting' | 'paused' | 'ready' | 'sources_only' | 'blocked' | 'failed' | 'no_change';
 export type Evidence = {
@@ -23,12 +23,16 @@ export type ResearchJob = {
 };
 const DATABASE = 'drast-private-research-v1';
 const STORE = 'research-jobs';
+const SYNC_STORE = 'research-cloud-versions';
+export type CloudSyncStamp = { id: string; version: string; localUpdatedAt: string; cloudUpdatedAt: string };
+export type CloudJobSummary = { id: string; version: string; updatedAt: string; jobUpdatedAt?: string; question?: string; status?: TaskStatus; companyIds?: string[] };
+export type CloudJobsStatus = { configured: boolean; connected: boolean; projectRef?: string|null; message?: string };
 let opening: Promise<IDBDatabase> | undefined;
 function database(): Promise<IDBDatabase> {
   if (typeof indexedDB === 'undefined') return Promise.reject(new Error('هذا المتصفح لا يتيح الحفظ المحلي. افتح المنصة في متصفح يدعم IndexedDB.'));
   if (!opening) opening = new Promise((resolve, reject) => {
-    const request = indexedDB.open(DATABASE, 1);
-    request.onupgradeneeded = () => request.result.createObjectStore(STORE, { keyPath: 'id' });
+    const request = indexedDB.open(DATABASE, 2);
+    request.onupgradeneeded = () => { const db=request.result; if(!db.objectStoreNames.contains(STORE))db.createObjectStore(STORE,{keyPath:'id'});if(!db.objectStoreNames.contains(SYNC_STORE))db.createObjectStore(SYNC_STORE,{keyPath:'id'}); };
     request.onerror = () => { opening = undefined; reject(new Error('تعذّر فتح الحفظ المحلي. قد تكون مساحة المتصفح غير متاحة.')); };
     request.onblocked = () => { opening = undefined; reject(new Error('أغلق النسخ القديمة من المنصة، ثم أعد فتح هذه الصفحة.')); };
     request.onsuccess = () => {
@@ -64,20 +68,17 @@ export async function saveResearchJobs(jobs: ResearchJob[]): Promise<void> {
 export async function removeResearchJob(id: string): Promise<void> {
   const db = await database();
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction(STORE, 'readwrite');
+    const transaction = db.transaction([STORE,SYNC_STORE], 'readwrite');
     transaction.objectStore(STORE).delete(id);
+    transaction.objectStore(SYNC_STORE).delete(id);
     transaction.oncomplete = () => resolve();
     transaction.onerror = () => reject(new Error('تعذّر حذف المهمة.'));
   });
 }
-export function parseResearchBackup(value: unknown, allowedCompanies: string[]): ResearchJob[] {
-  const data = value as { schemaVersion?: number; jobs?: unknown[]; job?: unknown };
-  const records = data && Array.isArray(data.jobs) ? data.jobs : data?.job ? [data.job] : null;
-  if (!data || data.schemaVersion !== 1 || !records || records.length > 1000) throw new Error('الملف ليس نسخة احتياطية صالحة من منصة دراسات.');
+export function validateResearchJobPayload(raw: unknown, allowedCompanies: string[]): ResearchJob {
   const statuses: TaskStatus[] = ['queued', 'collecting', 'drafting', 'paused', 'ready', 'sources_only', 'blocked', 'failed', 'no_change'];
   const types: ResearchType[] = ['results', 'event', 'sector'];
-  const restored = records.map(raw => {
-    const job = raw as ResearchJob;
+  const job = raw as ResearchJob;
     if (!job || typeof job.id !== 'string' || !/^[a-zA-Z0-9-]{1,80}$/.test(job.id) || !types.includes(job.type) || !statuses.includes(job.status)
       || typeof job.question !== 'string' || job.question.length > 2000 || !job.question.trim()
       || !Array.isArray(job.companyIds) || job.companyIds.length < 1 || job.companyIds.length > 3 || new Set(job.companyIds).size !== job.companyIds.length || job.companyIds.some(id => !allowedCompanies.includes(id))
@@ -94,6 +95,16 @@ export function parseResearchBackup(value: unknown, allowedCompanies: string[]):
       || job.report.sections.some(s => !s || typeof s.title !== 'string' || typeof s.body !== 'string' || !['fact', 'management', 'analysis', 'scenario'].includes(s.kind) || !Array.isArray(s.sourceIds) || !s.sourceIds.every(id => typeof id === 'string' && job.evidence.some(e => e.id === id)))
       || !Array.isArray(job.report.limitations) || !job.report.limitations.every(x => typeof x === 'string') || !Array.isArray(job.report.nextWatch) || !job.report.nextWatch.every(x => typeof x === 'string'))) throw new Error('تحتوي النسخة على تقرير غير صالح؛ لم تُستورد أي بيانات.');
     if (['ready', 'sources_only'].includes(job.status) && !job.report) throw new Error('تحتوي النسخة على مهمة مكتملة دون تقرير صالح.');
+
+  const {cloudSync: _ignoredSync, owner: _ignoredOwner, ...safeJob}=job as ResearchJob & {cloudSync?:unknown;owner?:unknown};
+  return safeJob;
+}
+export function parseResearchBackup(value: unknown, allowedCompanies: string[]): ResearchJob[] {
+  const data = value as { schemaVersion?: number; jobs?: unknown[]; job?: unknown };
+  const records = data && Array.isArray(data.jobs) ? data.jobs : data?.job ? [data.job] : null;
+  if (!data || data.schemaVersion !== 1 || !records || records.length > 1000) throw new Error('الملف ليس نسخة احتياطية صالحة من منصة دراسات.');
+  const restored = records.map(raw => {
+    const job=validateResearchJobPayload(raw,allowedCompanies);
     return { ...job, fingerprint: undefined, forceVersion: false, status: ['collecting', 'drafting'].includes(job.status) ? 'paused' as TaskStatus : job.status, collectedCompanyIds: job.collectedCompanyIds.filter(id => job.companyIds.includes(id)) };
   });
   if (new Set(restored.map(job => job.id)).size !== restored.length) throw new Error('تحتوي النسخة على معرّفات مهام مكررة.');
@@ -101,4 +112,23 @@ export function parseResearchBackup(value: unknown, allowedCompanies: string[]):
     const previous = restored.find(other => other.id === job.duplicateOf && other.id !== job.id && other.report);
     return { ...job, duplicateOf: previous?.id, status: job.status === 'no_change' && !previous ? 'paused' : job.status };
   });
+}
+
+export async function readCloudSyncStamps(): Promise<CloudSyncStamp[]> {
+  const db=await database();return new Promise((resolve,reject)=>{const request=db.transaction(SYNC_STORE,'readonly').objectStore(SYNC_STORE).getAll();request.onsuccess=()=>resolve(request.result as CloudSyncStamp[]);request.onerror=()=>reject(new Error('تعذّرت قراءة حالة الحفظ السحابي المحلية.'));});
+}
+export async function saveCloudSyncStamp(stamp:CloudSyncStamp):Promise<void>{
+  const db=await database();return new Promise((resolve,reject)=>{const transaction=db.transaction(SYNC_STORE,'readwrite');transaction.objectStore(SYNC_STORE).put(stamp);transaction.oncomplete=()=>resolve();transaction.onerror=()=>reject(new Error('حُفظت النسخة سحابيًا، لكن تعذّر تسجيل رقم نسختها محليًا.'));transaction.onabort=()=>reject(new Error('تعذّر تسجيل حالة الحفظ السحابي محليًا.'));});
+}
+async function cloudResponse(response:Response){
+  let data:any;try{data=await response.json();}catch{throw new Error('استجابة الحفظ السحابي غير مكتملة.');}
+  if(!response.ok){const error=new Error(typeof data.error==='string'?data.error:'تعذّر الاتصال بالحفظ السحابي.') as Error&{code?:string};error.code=data.code;throw error;}return data;
+}
+export async function checkCloudJobs():Promise<CloudJobsStatus>{return cloudResponse(await fetch('/api/research/jobs?status=1',{cache:'no-store'}));}
+export async function listCloudJobs():Promise<CloudJobSummary[]>{
+  const records:CloudJobSummary[]=[];let offset=0;for(let page=0;page<50;page++){const data=await cloudResponse(await fetch(`/api/research/jobs?offset=${offset}`,{cache:'no-store'}));if(!Array.isArray(data.jobs))throw new Error('قائمة المهام السحابية غير صالحة.');records.push(...data.jobs);if(data.nextOffset===null||data.nextOffset===undefined)return records;offset=data.nextOffset;}throw new Error('قائمة المهام كبيرة جدًا لهذه النسخة.');
+}
+export async function fetchCloudJob(id:string):Promise<{job:ResearchJob;version:string;updatedAt:string}>{return cloudResponse(await fetch(`/api/research/jobs?id=${encodeURIComponent(id)}`,{cache:'no-store'}));}
+export async function uploadCloudJob(job:ResearchJob,expectedVersion:string|null):Promise<{id:string;version:string;updatedAt:string}>{
+ return cloudResponse(await fetch('/api/research/jobs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({job,expectedVersion})}));
 }
