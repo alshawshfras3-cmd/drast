@@ -18,6 +18,7 @@ test('production ignores forged Sites identity headers and requires configured p
  assert.equal(workspaceActor(req,{NODE_ENV:'production'}),null);
  assert.equal(workspaceActor(req,{NODE_ENV:'production',VERCEL:'1'}),null);
  assert.equal(workspaceActor(req,{NODE_ENV:'production',VERCEL:'1',DRAST_PRIVATE_WORKSPACE:'enabled'}),owner);
+ assert.equal(workspaceActor(new Request('https://drast.vercel.app/api/workspace'),{NODE_ENV:'production',VERCEL:'1',DRAST_PRIVATE_WORKSPACE:'enabled'}),owner);
 });
 test('production refuses custom or unknown hosts; development is loopback-only',()=>{
  assert.equal(workspaceActor(new Request('https://unprotected.example/api'),{VERCEL:'1',DRAST_PRIVATE_WORKSPACE:'enabled'}),null);
