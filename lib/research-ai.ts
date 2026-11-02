@@ -2,7 +2,7 @@ import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { generateText } from 'ai';
 import { freeModelConfig, freeRequestBody } from './free-model-policy.mjs';
 import { buildResearchPrompt, createSourcesOnlyReport, preparePromptEvidence } from './research-contract.mjs';
-import { draftWithValidation } from './report-drafting.mjs';
+import { draftWithValidation, reportDiagnostic } from './report-drafting.mjs';
 import { vercelFreeConfig } from './vercel-free-policy.mjs';
 import { generateVercelFreeText } from './vercel-free-ai';
 
@@ -48,11 +48,19 @@ export async function generateResearchText(prompt: string, maxOutputTokens = 320
     maxOutputTokens, maxRetries: 0, abortSignal: AbortSignal.timeout(Math.min(50_000, Math.max(1000, timeoutMs))),
   });
   if (result.finishReason === 'length') throw new Error('REPORT_TRUNCATED');
+  if (!result.text.trim()) throw new Error('MODEL_EMPTY_RESPONSE');
   return { text: result.text, model: actualModel, provider: 'OpenRouter', cost: null };
 }
 
 // Do not expose upstream response bodies, prompts or credentials in errors.
-export function researchError(error: unknown): { message: string; status: number } {
+export function researchError(error: unknown): { message: string; status: number; diagnostic?: {stage:string;attempt:number;reason:string;field?:string} } {
+  const diagnostic = reportDiagnostic(error);
+  const safe = researchErrorMessage(error);
+  if (!diagnostic) return safe;
+  const stageNames: Record<string,string> = {generation:'استجابة النموذج',parsing:'قراءة JSON',validation:'فحص التقرير'};
+  return {...safe,diagnostic,message:`${safe.message} المرحلة: ${stageNames[diagnostic.stage]}، المحاولة ${diagnostic.attempt}، الرمز ${diagnostic.reason}${diagnostic.field ? `، الحقل ${diagnostic.field}` : ''}.`};
+}
+function researchErrorMessage(error: unknown): {message:string;status:number} {
   const validationCode = (error as any)?.code;
   const validationMessages: Record<string,string> = {
     UNSUPPORTED_FINANCIAL_NUMBER: 'أوقف فحص الأرقام المسودة: تضمنت مبلغًا أو نسبة لا تطابق نص الأدلة المستشهد بها. لم تُعتمد هذه الأرقام.',
@@ -61,6 +69,12 @@ export function researchError(error: unknown): { message: string; status: number
     UNSOURCED_REPORT_SECTION: 'أوقفت المراجعة المسودة لأن أحد أقسامها بلا مصدر.',
     INVALID_TEXT_LENGTH: 'لم تُعتمد المسودة لأن أحد نصوصها تجاوز الحجم المطلوب.',
     INVALID_REPORT_JSON: 'رد النموذج لم يطابق صيغة التقرير المطلوبة؛ لم تُعتمد المسودة.',
+    INVALID_REPORT: 'لم يُعد النموذج كائن تقرير صالحًا؛ لم تُعتمد المسودة.',
+    INVALID_REPORT_SECTIONS: 'لم تُعتمد المسودة لأن قائمة أقسامها مفقودة أو خارج العدد المسموح.',
+    INVALID_REPORT_SECTION: 'لم تُعتمد المسودة لأن نوع أحد أقسامها غير صالح.',
+    INVALID_REPORT_LIST: 'لم تُعتمد المسودة لأن قائمة القيود أو المتابعة مفقودة أو غير صالحة.',
+    INVALID_TEXT: 'لم تُعتمد المسودة لأن أحد حقول النص المطلوبة مفقود أو بصيغة غير نصية.',
+    REPORT_TOO_LARGE: 'لم تُعتمد المسودة لأنها تجاوزت حجم التقرير المسموح.',
   };
   if (validationMessages[validationCode]) {
     const detail = validationCode === 'UNSUPPORTED_FINANCIAL_NUMBER' ? (error as any)?.details : null;
@@ -70,9 +84,12 @@ export function researchError(error: unknown): { message: string; status: number
   const diagnostic = [String((error as any)?.message || ''), String((error as any)?.type || ''), String((error as any)?.cause?.message || ''), String((error as any)?.cause?.responseBody || '')].join(' ');
   if (String((error as any)?.message || '').includes('FREE_MODEL_')) return { status: 503, message: 'المسار المجاني غير متاح أو تغير سعره. توقفت الصياغة دون استخدام بديل مدفوع.' };
   if (diagnostic.includes('customer_verification_required')) return { status: 503, message: 'يتطلب حساب Vercel اعتماد الوصول إلى AI Gateway قبل تشغيل النموذج. لم تُفعّل مدفوعات أو تعبئة رصيد تلقائية.' };
-  const code = (error as any)?.statusCode;
+  const tagged = reportDiagnostic(error);
+  const code = (error as any)?.statusCode ?? (tagged?.reason?.startsWith('UPSTREAM_') ? Number(tagged.reason.slice(9)) : undefined);
+  if (tagged?.reason === 'MODEL_TIMEOUT') return {status:504,message:'انتهت مهلة النموذج. المصادر محفوظة ويمكن استئناف الصياغة.'};
   if (diagnostic.includes('REPORT_TRUNCATED')) return { status: 422, message: 'بلغ رد النموذج حد الإخراج قبل اكتماله. لم تُعتمد مسودة ناقصة؛ المصادر محفوظة.' };
   if (diagnostic.includes('MODEL_EMPTY_RESPONSE')) return { status: 422, message: 'لم يُرجع المزوّد نصًا قابلًا للقراءة. لم يتأكد نجاح الاتصال بالنموذج.' };
+  if (tagged?.stage === 'parsing') return {status:422,message:validationMessages.INVALID_REPORT_JSON};
   if (code === 400) return { status: 422, message: 'رفض المزوّد إعدادات طلب النموذج. يلزم تعديل الربط؛ لا حاجة إلى شحن رصيد لهذا الخطأ.' };
   if (code === 429) return { status: 429, message: 'بلغ النموذج المجاني حد الاستخدام أو تعذر توفره مؤقتًا. حُفظت المصادر؛ أعد المحاولة لاحقًا. لن ينتقل النظام إلى نموذج مدفوع.' };
   if (code === 401 || code === 403 || diagnostic.includes('VERCEL_OIDC_MISSING') || diagnostic.includes('MODEL_NOT_CONFIGURED')) return { status: 503, message: 'تعذر اعتماد الاتصال بالنموذج لهذا المشروع. راجع هوية Vercel للمشروع أو أضف مفتاح OpenRouter مخصصًا في إعدادات الاستضافة.' };

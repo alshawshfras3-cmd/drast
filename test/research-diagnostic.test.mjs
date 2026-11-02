@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import ts from 'typescript';
+const source=readFileSync(new URL('../lib/research-ai.ts',import.meta.url),'utf8');
+const code=`import {reportDiagnostic} from ${JSON.stringify(new URL('../lib/report-drafting.mjs',import.meta.url).href)};\n`+source.slice(source.indexOf('export function researchError('));
+const {outputText}=ts.transpileModule(code,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}});
+const {researchError}=await import('data:text/javascript;base64,'+Buffer.from(outputText).toString('base64'));
+test('safe diagnostics identify JSON parsing without revealing provider error text',()=>{const error=new SyntaxError('SECRET_FROM_MODEL');error.reportDiagnostic={stage:'parsing',attempt:2,reason:'INVALID_REPORT_JSON'};const safe=researchError(error);assert.equal(safe.status,422);assert.match(safe.message,/قراءة JSON.*المحاولة 2.*INVALID_REPORT_JSON/);assert.doesNotMatch(JSON.stringify(safe),/SECRET/);});
+test('all report-shape failures have a specific Arabic explanation',()=>{for(const code of ['INVALID_REPORT','INVALID_REPORT_SECTIONS','INVALID_REPORT_SECTION','INVALID_REPORT_LIST','INVALID_TEXT','REPORT_TOO_LARGE']){const error=Object.assign(new Error('unsafe'),{code,reportDiagnostic:{stage:'validation',attempt:2,reason:code}});const safe=researchError(error);assert.equal(safe.status,422);assert.match(safe.message,/فحص التقرير/);assert.doesNotMatch(safe.message,/لم يجتز التقرير فحص البنية أو الاستشهادات/);}});
+test('nested SDK quota and timeout retain correct HTTP statuses',()=>{const quota=new Error('SDK_WRAPPER');quota.reportDiagnostic={stage:'generation',attempt:2,reason:'UPSTREAM_429'};assert.equal(researchError(quota).status,429);const timeout=new Error('SDK_WRAPPER');timeout.reportDiagnostic={stage:'generation',attempt:1,reason:'MODEL_TIMEOUT'};assert.equal(researchError(timeout).status,504);});
+test('diagnostic field and reason injection is discarded',()=>{const error=new Error('unsafe');error.reportDiagnostic={stage:'parsing',attempt:2,reason:'SECRET',field:'prompt'};assert.equal(researchError(error).diagnostic,undefined);error.reportDiagnostic.reason='INVALID_REPORT_JSON';assert.equal(researchError(error).diagnostic.field,undefined);});

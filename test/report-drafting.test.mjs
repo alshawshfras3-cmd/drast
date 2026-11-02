@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { draftWithValidation } from '../lib/report-drafting.mjs';
+import { draftWithValidation, reportDiagnostic } from '../lib/report-drafting.mjs';
 
 const evidence=[{id:'almarai-official',companyId:'almarai',title:'نتائج رسمية',url:'https://www.almarai.com/en/corporate/investors/press-releases',text:'بلغت الإيرادات 100 مليون ريال في الفترة المعلنة.',kind:'html',checkedAt:'2026-11-03T00:00:00Z'}];
 const valid={title:'مسودة المراعي',summary:'تحتاج الفترة إلى مراجعة.',sections:[{title:'الإيرادات',body:'بلغت الإيرادات 100 مليون ريال وفق المصدر المرفق.',kind:'fact',sourceIds:['almarai-official']}],limitations:['يلزم الرجوع إلى القوائم.'],nextWatch:['مراجعة التدفقات.']};
@@ -12,3 +12,7 @@ test('a rejected number gets only one correction and both responses are validate
 test('malformed JSON is corrected once without becoming an accepted partial report',async()=>{let calls=0;const result=await invoke(async()=>++calls===1?{text:'{"title":'}:output(valid));assert.equal(calls,2);assert.equal(result.report.title,valid.title);});
 test('quota and transport failures never trigger another request',async()=>{let calls=0;await assert.rejects(invoke(async()=>{calls++;throw Object.assign(new Error('quota'),{statusCode:429});}));assert.equal(calls,1);});
 test('validation cannot start a correction when the request budget is nearly exhausted',async()=>{let calls=0,time=0;await assert.rejects(invoke(async()=>{calls++;time=45000;return{text:'invalid'};},()=>time));assert.equal(calls,1);});
+test('empty real responses fail at generation without a repair call',async()=>{let calls=0;await assert.rejects(invoke(async()=>{calls++;return{text:'  '};}),error=>{assert.deepEqual(reportDiagnostic(error),{stage:'generation',attempt:1,reason:'MODEL_EMPTY_RESPONSE'});return true;});assert.equal(calls,1);});
+test('the final malformed JSON response reports parsing and attempt two without model text',async()=>{await assert.rejects(invoke(async()=>({text:'{"title":SECRET_INVALID_JSON'})),error=>{assert.deepEqual(reportDiagnostic(error),{stage:'parsing',attempt:2,reason:'INVALID_REPORT_JSON'});assert.equal(JSON.stringify(reportDiagnostic(error)).includes('SECRET'),false);return true;});});
+test('missing report lists identify a safe schema field after bounded correction',async()=>{const bad={...valid};delete bad.nextWatch;await assert.rejects(invoke(async()=>output(bad)),error=>{assert.deepEqual(reportDiagnostic(error),{stage:'validation',attempt:2,reason:'INVALID_REPORT_LIST',field:'nextWatch'});return true;});});
+test('correction generation errors preserve quota and nested timeout diagnostics',async()=>{for(const [failure,reason]of [[Object.assign(new Error('quota'),{statusCode:429}),'UPSTREAM_429'],[new Error('outer',{cause:Object.assign(new Error('timed out'),{name:'TimeoutError'})}),'MODEL_TIMEOUT']]){let calls=0;await assert.rejects(invoke(async()=>{if(++calls===1)return{text:'bad-json'};throw failure;}),error=>{assert.deepEqual(reportDiagnostic(error),{stage:'generation',attempt:2,reason});return true;});assert.equal(calls,2);}});
