@@ -70,7 +70,7 @@ export default function Workspace(){
  return <div className="workspace">
   <header className={`app-header ${headerHidden?'is-hidden':''}`} onFocusCapture={()=>setHeaderHidden(false)}>
    <div className="header-inner">
-    <a className="brand-wordmark" href="/" aria-label="دراسات — مساحة البحث المالي"><img src="/brand-mark.svg" alt="" width="42" height="42"/><span><strong>دراسات</strong><small>مساحة البحث المالي</small></span></a>
+    <a className="brand-wordmark" href="/" aria-label="دراسات — مساحة البحث المالي"><img src="/brand/drast-mark.svg" alt="" width="42" height="42"/><span><strong>دراسات</strong><small>مساحة البحث المالي</small></span></a>
     <nav id="workspace-navigation" className={`desktop-nav ${mobile?'is-open':''}`} aria-label="التنقل الرئيسي">
      {navItems.map(item=><button key={item.id} className={nav===item.id?'active':''} aria-current={nav===item.id?'page':undefined} onClick={()=>{setNav(item.id);setMobile(false)}}><item.icon size={18}/><span>{item.title}</span>{item.id==='studies'&&<small>{num(studies.length)}</small>}</button>)}
     </nav>

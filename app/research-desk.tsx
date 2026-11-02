@@ -5,7 +5,6 @@ import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowUpLeft, BookOpen, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft, Clock3, Download, ExternalLink, FilePenLine, FileText, FolderArchive, HardDrive, History, Inbox, Layers3, ListTodo, LoaderCircle, Pause, Play, Plus, Printer, RefreshCw, Save, Search, ShieldCheck, Sparkles, TriangleAlert, Upload, X } from 'lucide-react';
 import { isSafeSourceUrl } from '@/lib/study-engine.mjs';
 import { parseResearchBackup, readResearchJobs, removeResearchJob, saveResearchJob, saveResearchJobs, type Evidence, type ResearchJob, type ResearchReport, type ResearchType, type TaskStatus } from './pilot-browser-store';
-import './research.css';
 
 export type ResearchCompany = { id: string; name: string; ticker: string; sector: string; entityKind?: 'listed' | 'project' | 'private_company' };
 type ProviderStatus = { configured: boolean; provider: string; model: string; freeOnly: boolean; mode: 'ai' | 'sources_only' };

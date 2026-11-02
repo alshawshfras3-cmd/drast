@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowUpLeft, BookOpen, Building2, Calculator, Check, CheckCircle2, ChevronDown, ExternalLink, FileCheck2, FilePenLine, FileSearch, FileText, FolderOpen, Layers3, ListFilter, Network, Printer, Search, ShieldCheck, Sparkles, TriangleAlert, X, Download } from 'lucide-react';
 import { isSafeSourceUrl } from '@/lib/study-engine.mjs';
-import './entity-directory.css';
 
 export type StrategicProfile = {
   id: string; name?: string; company?: string; displayName?: string; englishName?: string;
