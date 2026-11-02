@@ -1,11 +1,26 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { draftWithValidation, reportDiagnostic } from '../lib/report-drafting.mjs';
+import { draftWithValidation, reportDiagnostic, shortSourceReferences } from '../lib/report-drafting.mjs';
 
 const evidence=[{id:'almarai-official',companyId:'almarai',title:'نتائج رسمية',url:'https://www.almarai.com/en/corporate/investors/press-releases',text:'بلغت الإيرادات 100 مليون ريال في الفترة المعلنة.',kind:'html',checkedAt:'2026-11-03T00:00:00Z'}];
 const valid={title:'مسودة المراعي',summary:'تحتاج الفترة إلى مراجعة.',sections:[{title:'الإيرادات',body:'بلغت الإيرادات 100 مليون ريال وفق المصدر المرفق.',kind:'fact',sourceIds:['almarai-official']}],limitations:['يلزم الرجوع إلى القوائم.'],nextWatch:['مراجعة التدفقات.']};
 const invoke=(generate,now)=>draftWithValidation({prompt:'أدلة عامة',evidence,companyIds:['almarai'],generate,now});
 const output=report=>({text:JSON.stringify(report),model:'free-model'});
+
+test('short citation labels round-trip to exact stored documents without mutating evidence',async()=>{
+ const original=structuredClone(evidence),references=shortSourceReferences(evidence);
+ assert.equal(references.evidence[0].id,'S1');assert.deepEqual(evidence,original);
+ const generated=await draftWithValidation({prompt:'مصدر S1',evidence:references.evidence,companyIds:['almarai'],generate:async()=>output({...valid,sections:[{...valid.sections[0],sourceIds:['S1']}]})});
+ assert.equal(references.restore(generated.report).sections[0].sourceIds[0],'almarai-official');
+ const next=shortSourceReferences([{...evidence[0],id:'different-document'}]);
+ assert.equal(next.restore(generated.report).sections[0].sourceIds[0],'different-document');
+});
+test('short labels never infer an unknown citation or borrow numbers from an uncited document',async()=>{
+ const references=shortSourceReferences([...evidence,{...evidence[0],id:'second-document',text:'بلغت الإيرادات 200 مليون ريال في الفترة المعلنة.'}]);
+ assert.throws(()=>references.restore({...valid,sections:[{...valid.sections[0],sourceIds:['S9']}]}),error=>error.code==='UNKNOWN_REPORT_SOURCE');
+ await assert.rejects(draftWithValidation({prompt:'مصدران',evidence:references.evidence,companyIds:['almarai'],generate:async()=>output({...valid,sections:[{...valid.sections[0],body:'بلغت الإيرادات 200 مليون ريال.',sourceIds:['S1']}]})}),error=>error.code==='UNSUPPORTED_FINANCIAL_NUMBER');
+ assert.throws(()=>shortSourceReferences([...evidence,evidence[0]]));
+});
 
 test('a valid draft uses one call and remains subject to the financial contract',async()=>{let calls=0;const result=await invoke(async()=>{calls++;return output(valid);});assert.equal(calls,1);assert.equal(result.report.sections[0].sourceIds[0],'almarai-official');});
 test('a rejected number gets only one correction and both responses are validated',async()=>{let calls=0;const bad={...valid,sections:[{...valid.sections[0],body:'بلغت الإيرادات 999 مليون ريال.'}]};const result=await invoke(async(prompt,timeout)=>{calls++;assert.ok(timeout<=50000);if(calls===1)return output(bad);assert.match(prompt,/UNSUPPORTED_FINANCIAL_NUMBER/);assert.match(prompt,/الرقم المرفوض في القسم 1: 999/);return output(valid);});assert.equal(calls,2);assert.match(result.report.sections[0].body,/100/);await assert.rejects(invoke(async()=>output(bad)),error=>error.code==='UNSUPPORTED_FINANCIAL_NUMBER'&&error.details.token==='999');});

@@ -2,7 +2,7 @@ import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { generateText } from 'ai';
 import { freeModelConfig, freeRequestBody } from './free-model-policy.mjs';
 import { buildResearchPrompt, createSourcesOnlyReport, preparePromptEvidence } from './research-contract.mjs';
-import { draftWithValidation, reportDiagnostic } from './report-drafting.mjs';
+import { draftWithValidation, reportDiagnostic, shortSourceReferences } from './report-drafting.mjs';
 import { vercelFreeConfig } from './vercel-free-policy.mjs';
 import { generateVercelFreeText } from './vercel-free-ai';
 
@@ -16,8 +16,9 @@ export async function draftResearch(input: any) {
   const config = researchProviderStatus();
   if (!config.configured) return { report: createSourcesOnlyReport(input), mode: 'sources_only', model: null };
   const selectedEvidence = preparePromptEvidence(input.evidence, input.companyIds);
-  const generated = await draftWithValidation({ prompt: buildResearchPrompt({ ...input, evidence: selectedEvidence }), evidence: selectedEvidence, companyIds: input.companyIds, generate: (prompt: string, timeout: number) => generateResearchText(prompt, 3200, timeout) });
-  const report = generated.report;
+  const references = shortSourceReferences(selectedEvidence);
+  const generated = await draftWithValidation({ prompt: buildResearchPrompt({ ...input, evidence: references.evidence }), evidence: references.evidence, companyIds: input.companyIds, generate: (prompt: string, timeout: number) => generateResearchText(prompt, 3200, timeout) });
+  const report = references.restore(generated.report);
   report.limitations = [...new Set([...report.limitations, ...(input.issues || [])])];
   return { report, mode: 'ai', model: generated.model, provider: generated.provider, cost: generated.cost };
 }
