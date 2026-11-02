@@ -29,6 +29,21 @@ function configuration(): SupabaseConfig | null {
 
 /** Configuration only. A successful database call is still needed to verify readiness. */
 export const storageReady = () => configuration() !== null;
+/** Safe troubleshooting only; no key, token fragments or raw environment values. */
+export function storageConfigurationMessage(): string {
+  if (configuration()) return '';
+  const rawUrl = process.env.SUPABASE_URL?.trim();
+  const key = (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)?.trim();
+  if (!rawUrl || !key) return 'إعدادات Supabase غير مكتملة في بيئة النشر الحالية؛ يلزم رابط المشروع ومفتاح الخادم.';
+  try {
+    const url = new URL(rawUrl);
+    if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash || !['','/'].includes(url.pathname)) return 'صيغة رابط Supabase غير صالحة؛ استخدم رابط المشروع الأساسي HTTPS دون مسار إضافي أو بيانات دخول.';
+  } catch { return 'صيغة رابط Supabase غير صالحة؛ انسخ رابط المشروع الأساسي من إعدادات المشروع.'; }
+  if (/\s/.test(key)) return 'مفتاح Supabase يحتوي مسافات أو أسطرًا إضافية. أعد نسخه كاملًا في متغير الخادم ثم أعد النشر.';
+  if (key.startsWith('sb_publishable_')) return 'المفتاح المضاف عام من نوع publishable؛ هذا الربط يحتاج مفتاح الخادم السري sb_secret أو service_role، ولا يكفي المفتاح العام.';
+  try { if (JSON.parse(Buffer.from(key.split('.')[1], 'base64url').toString('utf8'))?.role === 'anon') return 'المفتاح المضاف من نوع anon العام؛ يلزم مفتاح الخادم service_role أو sb_secret في المتغير السري.'; } catch {}
+  return 'الرابط موجود، لكن صيغة مفتاح الخادم لم تُقبل. انسخ قيمة sb_secret أو service_role كاملةً في SUPABASE_SECRET_KEY ثم أعد النشر.';
+}
 export function supabaseProjectRef(): string | null {
   try {
     const url = new URL(process.env.SUPABASE_URL?.trim() || '');

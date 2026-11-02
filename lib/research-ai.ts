@@ -1,7 +1,8 @@
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { generateText } from 'ai';
-import { freeModelConfig, freeRequestBody, parseReportJson } from './free-model-policy.mjs';
-import { buildResearchPrompt, createSourcesOnlyReport, preparePromptEvidence, validateResearchReport } from './research-contract.mjs';
+import { freeModelConfig, freeRequestBody } from './free-model-policy.mjs';
+import { buildResearchPrompt, createSourcesOnlyReport, preparePromptEvidence } from './research-contract.mjs';
+import { draftWithValidation } from './report-drafting.mjs';
 import { vercelFreeConfig } from './vercel-free-policy.mjs';
 import { generateVercelFreeText } from './vercel-free-ai';
 
@@ -15,17 +16,17 @@ export async function draftResearch(input: any) {
   const config = researchProviderStatus();
   if (!config.configured) return { report: createSourcesOnlyReport(input), mode: 'sources_only', model: null };
   const selectedEvidence = preparePromptEvidence(input.evidence, input.companyIds);
-  const generated = await generateResearchText(buildResearchPrompt({ ...input, evidence: selectedEvidence }));
-  const report = validateResearchReport(parseReportJson(generated.text), selectedEvidence, { companyIds: input.companyIds });
+  const generated = await draftWithValidation({ prompt: buildResearchPrompt({ ...input, evidence: selectedEvidence }), evidence: selectedEvidence, companyIds: input.companyIds, generate: (prompt: string, timeout: number) => generateResearchText(prompt, 3200, timeout) });
+  const report = generated.report;
   report.limitations = [...new Set([...report.limitations, ...(input.issues || [])])];
   return { report, mode: 'ai', model: generated.model, provider: generated.provider, cost: generated.cost };
 }
 
 /** The connection test and real drafts use exactly the same configured route. */
-export async function generateResearchText(prompt: string, maxOutputTokens = 3200) {
+export async function generateResearchText(prompt: string, maxOutputTokens = 3200, timeoutMs = 50_000) {
   const config = researchProviderStatus();
   if (!config.configured) throw new Error('MODEL_NOT_CONFIGURED');
-  if (config.provider === 'Vercel AI Gateway') return generateVercelFreeText(prompt, maxOutputTokens);
+  if (config.provider === 'Vercel AI Gateway') return generateVercelFreeText(prompt, maxOutputTokens, timeoutMs);
   let actualModel = config.model;
   const provider = createOpenAICompatible({
     name: 'openrouter', baseURL: 'https://openrouter.ai/api/v1',
@@ -44,7 +45,7 @@ export async function generateResearchText(prompt: string, maxOutputTokens = 320
   });
   const result = await generateText({
     model: provider.chatModel(config.model), prompt,
-    maxOutputTokens, maxRetries: 0, abortSignal: AbortSignal.timeout(50_000),
+    maxOutputTokens, maxRetries: 0, abortSignal: AbortSignal.timeout(Math.min(50_000, Math.max(1000, timeoutMs))),
   });
   if (result.finishReason === 'length') throw new Error('REPORT_TRUNCATED');
   return { text: result.text, model: actualModel, provider: 'OpenRouter', cost: null };
@@ -52,6 +53,16 @@ export async function generateResearchText(prompt: string, maxOutputTokens = 320
 
 // Do not expose upstream response bodies, prompts or credentials in errors.
 export function researchError(error: unknown): { message: string; status: number } {
+  const validationCode = (error as any)?.code;
+  const validationMessages: Record<string,string> = {
+    UNSUPPORTED_FINANCIAL_NUMBER: 'أوقف فحص الأرقام المسودة: تضمنت مبلغًا أو نسبة لا تطابق نص الأدلة المستشهد بها. لم تُعتمد هذه الأرقام.',
+    UNSUPPORTED_PAGE_REFERENCE: 'أوقفت المراجعة المسودة لأن إحالة صفحة لم تظهر في مقتطفات المصدر.',
+    UNKNOWN_REPORT_SOURCE: 'أوقفت المراجعة المسودة لأن النموذج أشار إلى معرّف مصدر غير مرفق.',
+    UNSOURCED_REPORT_SECTION: 'أوقفت المراجعة المسودة لأن أحد أقسامها بلا مصدر.',
+    INVALID_TEXT_LENGTH: 'لم تُعتمد المسودة لأن أحد نصوصها تجاوز الحجم المطلوب.',
+    INVALID_REPORT_JSON: 'رد النموذج لم يطابق صيغة التقرير المطلوبة؛ لم تُعتمد المسودة.',
+  };
+  if (validationMessages[validationCode]) return {status:422,message:validationMessages[validationCode]};
   const diagnostic = [String((error as any)?.message || ''), String((error as any)?.type || ''), String((error as any)?.cause?.message || ''), String((error as any)?.cause?.responseBody || '')].join(' ');
   if (String((error as any)?.message || '').includes('FREE_MODEL_')) return { status: 503, message: 'المسار المجاني غير متاح أو تغير سعره. توقفت الصياغة دون استخدام بديل مدفوع.' };
   if (diagnostic.includes('customer_verification_required')) return { status: 503, message: 'يتطلب حساب Vercel اعتماد الوصول إلى AI Gateway قبل تشغيل النموذج. لم تُفعّل مدفوعات أو تعبئة رصيد تلقائية.' };

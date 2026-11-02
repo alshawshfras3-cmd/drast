@@ -1,7 +1,8 @@
 import { createGateway, generateText } from 'ai';
 import { VERCEL_FREE_MODEL, VERCEL_FREE_PROVIDER, verifyZeroPriceEndpoint, vercelFreeConfig } from './vercel-free-policy.mjs';
 
-export async function generateVercelFreeText(prompt: string, maxOutputTokens = 3200) {
+export async function generateVercelFreeText(prompt: string, maxOutputTokens = 3200, timeoutMs = 50_000) {
+  const deadline = Date.now() + Math.min(50_000, Math.max(1000, timeoutMs));
   if (!vercelFreeConfig().configured) throw new Error('VERCEL_OIDC_MISSING');
   const catalogResponse = await fetch(`https://ai-gateway.vercel.sh/v1/models/${VERCEL_FREE_MODEL}/endpoints`, { cache: 'no-store', redirect: 'error', signal: AbortSignal.timeout(8000) });
   if (!catalogResponse.ok) throw new Error('FREE_MODEL_UNAVAILABLE');
@@ -19,7 +20,7 @@ export async function generateVercelFreeText(prompt: string, maxOutputTokens = 3
   const result = await generateText({
     model: provider(VERCEL_FREE_MODEL), prompt, maxOutputTokens,
     providerOptions: { gateway: { only: [VERCEL_FREE_PROVIDER] } },
-    reasoning: 'none', maxRetries: 0, abortSignal: AbortSignal.timeout(50_000),
+    reasoning: 'none', maxRetries: 0, abortSignal: AbortSignal.timeout(Math.max(1, deadline - Date.now())),
   });
   if (result.finishReason === 'length') throw new Error('REPORT_TRUNCATED');
   const metadata = result.providerMetadata?.gateway as any;

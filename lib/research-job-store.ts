@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { PILOT_COMPANIES } from './pilot-catalog.mjs';
 import { validateResearchJobPayload, type ResearchJob, type CloudJobSummary, type TaskStatus } from '../app/pilot-browser-store';
-import { storageReady, supabaseFetch, supabaseProjectRef } from './supabase-storage';
+import { storageReady, supabaseFetch, supabaseProjectRef, storageConfigurationMessage } from './supabase-storage';
 
 export class ResearchCloudError extends Error {
   constructor(message:string, public status=503, public code='cloud_unavailable'){super(message);this.name='ResearchCloudError';}
@@ -27,7 +27,7 @@ export function createResearchJobStore(dependencies:Partial<Dependencies>={}){
   const ready=dependencies.ready||storageReady,request=dependencies.request||supabaseFetch,now=dependencies.now||(()=>new Date().toISOString()),uuid=dependencies.uuid||randomUUID,projectRef=dependencies.projectRef||supabaseProjectRef;
   function configured(){if(!ready())throw new ResearchCloudError('الحفظ السحابي غير مهيّأ. أضف إعدادات Supabase الخاصة بهذا المشروع أولًا.',503,'cloud_unconfigured');}
   async function rows(response:Response){if(!response.ok)throw new ResearchCloudError('تعذّر الوصول إلى جدول مهام Supabase. تحقق من الاتصال والمفاتيح وتهيئة الجدول.');let value:unknown;try{value=await response.json();}catch{throw new ResearchCloudError('استجابة قاعدة البيانات غير مكتملة.');}if(!Array.isArray(value))throw new ResearchCloudError('استجابة قاعدة البيانات غير صالحة.');return value as Record<string,any>[];}
-  async function status(owner:string){ownerKey(owner);if(!ready())return{configured:false,connected:false,projectRef:projectRef(),message:'الحفظ في المتصفح متاح. إعدادات Supabase لم تُضف لهذا المشروع بعد.'};try{await rows(await request(path(owner,{select:'id',limit:'1'})));return{configured:true,connected:true,projectRef:projectRef()};}catch{return{configured:true,connected:false,projectRef:projectRef(),message:'إعدادات Supabase موجودة، لكن لم ينجح الوصول إلى جدول المهام. لم يتأكد أي حفظ سحابي.'};}}
+  async function status(owner:string){ownerKey(owner);if(!ready())return{configured:false,connected:false,projectRef:projectRef(),message:storageConfigurationMessage()};try{await rows(await request(path(owner,{select:'id',limit:'1'})));return{configured:true,connected:true,projectRef:projectRef()};}catch{return{configured:true,connected:false,projectRef:projectRef(),message:'إعدادات Supabase موجودة، لكن لم ينجح الوصول إلى جدول المهام. لم يتأكد أي حفظ سحابي.'};}}
   async function list(owner:string,offset=0){
     configured();if(!Number.isSafeInteger(offset)||offset<0||offset>1000)throw new ResearchCloudError('صفحة المهام غير صالحة.',400,'invalid_page');
     const records=await rows(await request(path(owner,{select:'id,version,updated_at,jobUpdatedAt:payload->>updatedAt,question:payload->>question,status:payload->>status,companyIds:payload->companyIds',order:'updated_at.desc,id.asc',limit:String(PAGE+1),offset:String(offset)})));

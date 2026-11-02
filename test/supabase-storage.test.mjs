@@ -22,6 +22,8 @@ function setup(t,handler){
 test('configuration is server-only, private-key based and refuses malformed origins',t=>{
  setup(t);assert.match(source,/import 'server-only'/);assert.equal(api.storageReady(),true);assert.equal(api.supabaseProjectRef(),'independent-test');
  process.env.SUPABASE_SECRET_KEY='sb_publishable_not_a_server_key';assert.equal(api.storageReady(),false);
+ assert.match(api.storageConfigurationMessage(),/publishable/);
+ assert.equal(api.storageConfigurationMessage().includes(process.env.SUPABASE_SECRET_KEY),false);
  process.env.SUPABASE_SECRET_KEY='sb_secret_unit_test_not_real';process.env.SUPABASE_URL='https://user:pass@example.com';assert.equal(api.storageReady(),false);
  process.env.SUPABASE_URL='http://project.supabase.co';assert.equal(api.storageReady(),false);
 });
@@ -40,6 +42,7 @@ test('legacy service-role JWT remains server-side and is supplied as Bearer',asy
  assert.equal(api.storageReady(),true);await api.supabaseFetch('/rest/v1/research_jobs');
  process.env.SUPABASE_SECRET_KEY='eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYW5vbiJ9.not-real';
  assert.equal(api.storageReady(),false);
+ assert.match(api.storageConfigurationMessage(),/anon/);
 });
 test('JSON records survive independent adapter reads and preserve owner-scoped upsert semantics',async t=>{
  const rows=new Map();setup(t,async(url,init)=>{
