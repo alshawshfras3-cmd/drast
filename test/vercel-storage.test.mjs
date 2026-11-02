@@ -30,6 +30,13 @@ test('writes require an exact origin including port',()=>{
  assert.equal(sameOrigin(new Request('https://app.example/api')),false);
  assert.equal(sameOrigin(new Request('https://app.example/api',{headers:{origin:'https://app.example'}})),true);
 });
+test('Next.js internal URLs use the actual request Host and TLS proxy protocol',()=>{
+ const req=new Request('http://127.0.0.1:3000/api',{headers:{host:'drast-frias-projects12.vercel.app','x-forwarded-proto':'https',origin:'https://drast-frias-projects12.vercel.app'}});
+ assert.equal(workspaceActor(req,{VERCEL:'1',DRAST_PRIVATE_WORKSPACE:'enabled'}),owner);
+ assert.equal(sameOrigin(req),true);
+ const wrong=new Request(req.url,{headers:{host:'drast-frias-projects12.vercel.app','x-forwarded-proto':'https',origin:'https://evil.example'}});
+ assert.equal(sameOrigin(wrong),false);
+});
 test('upload scope rejects traversal, records paths and unsupported extensions',()=>{
  assert.equal(validateUploadPath(path).id,id);
  for(const bad of ['../studies/x.json','drast/private-workspace/records/studies/x.json',path+'.exe',path.replace(id,'..')])assert.throws(()=>validateUploadPath(bad));
