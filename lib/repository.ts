@@ -1,11 +1,12 @@
-import { env } from 'cloudflare:workers';
 import { seedStudies } from './seeds';
-import { analyzeStudy } from './study-engine.mjs';
-export function actor(request:Request):string|null { return request.headers.get('oai-authenticated-user-id') || (process.env.NODE_ENV==='development'?'local-preview':null); }
-export function response(data:any,status=200){return Response.json(data,{status,headers:{'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'}})}
-export function originAllowed(request:Request){const o=request.headers.get('origin');return !!o&&o===new URL(request.url).origin;}
-export async function listStudies(owner:string){if(!env.DB)throw Error('قاعدة البيانات غير متاحة.');const rows=await env.DB.prepare('SELECT payload FROM studies WHERE owner_id=? ORDER BY updated_at DESC LIMIT 100').bind(owner).all();const all=new Map(seedStudies.map(s=>[s.id,s]));for(const r of rows.results) {const s=JSON.parse(r.payload as string);all.set(s.id,s)}return [...all.values()];}
-export async function getStudy(owner:string,id:string){const all=await listStudies(owner);return all.find(x=>x.id===id)||null;}
-export async function saveStudy(owner:string,study:any){if(!study||typeof study!=='object'||!/^[-a-zA-Z0-9_]{1,80}$/.test(study.id||'')||typeof study.company!=='string'||!study.company.trim()||study.company.length>200||!Array.isArray(study.sources)||!Array.isArray(study.quarters)||study.sources.length>100||study.quarters.length>40)throw Error('بنية الدراسة غير صحيحة.');if(JSON.stringify(study).length>500000)throw Error('الدراسة تتجاوز الحد المسموح.');const a=analyzeStudy(study);const errors=a.checks.filter((x:any)=>x.level==='error');if(errors.length)throw Error(errors.map((x:any)=>x.message).join(' — '));const payload={...study,status:'draft',updatedAt:new Date().toISOString()};await env.DB!.prepare('INSERT INTO studies (owner_id,id,payload,updated_at) VALUES (?,?,?,?) ON CONFLICT(owner_id,id) DO UPDATE SET payload=excluded.payload,updated_at=excluded.updated_at').bind(owner,study.id,JSON.stringify(payload),payload.updatedAt).run();return payload;}
-export async function listDocuments(owner:string){const r=await env.DB!.prepare('SELECT id,name,company,ticker,period,mime,size,page_count AS pageCount,extraction_status AS extractionStatus,created_at AS createdAt FROM documents WHERE owner_id=? ORDER BY created_at DESC LIMIT 100').bind(owner).all();return r.results;}
-export async function readDocument(owner:string,id:string):Promise<any>{const d=await env.DB!.prepare('SELECT * FROM documents WHERE owner_id=? AND id=?').bind(owner,id).first();if(!d)return null;const obj=await env.BUCKET!.get(d.text_key as string);return {...d,text:obj?await obj.text():'',storage_key:undefined,text_key:undefined,owner_id:undefined};}
+import { storage } from './blob-storage';
+import { createRepository } from './repository-core.mjs';
+import { workspaceActor, sameOrigin } from './access-policy.mjs';
+export const actor = (request: Request): string | null => workspaceActor(request);
+export const originAllowed = sameOrigin;
+export function response(data: unknown, status = 200) {
+  return Response.json(data, { status, headers: { 'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff' } });
+}
+const repository = createRepository(storage, seedStudies);
+export const { listStudies, saveStudy, listDocuments, readDocument, saveDocument, readFile } = repository;
+export async function getStudy(owner: string, id: string) { return (await listStudies(owner)).find((study: any) => study.id === id) || null; }
