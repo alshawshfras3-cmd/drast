@@ -50,13 +50,15 @@ const DEFAULT_QUESTIONS: Record<ResearchType, string> = {
   sector: 'قارن الجهات المختارة بحسب طبيعة نشاطها والمقاييس القابلة للمقارنة. وضّح اختلاف نشاط كل جهة وأي اختلاف في الوحدات أو الفترات، ولا تستنتج ترتيبًا عند نقص الأدلة.'
 };
 
-export default function ResearchDesk({ companies }: { companies: ResearchCompany[] }) {
+export default function ResearchDesk({ companies, renderFinancialCharts }: { companies: ResearchCompany[]; renderFinancialCharts?: (companyIds: string[]) => React.ReactNode }) {
   const [jobs, setJobs] = useState<ResearchJob[]>([]);
   const jobsRef = useRef<ResearchJob[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [storageError, setStorageError] = useState('');
   const [provider, setProvider] = useState<ProviderStatus | null>(null);
   const [providerError, setProviderError] = useState('');
+  const [testingConnection,setTestingConnection]=useState(false);
+  const [connectionTest,setConnectionTest]=useState<{ok:boolean;message:string;provider?:string;model?:string;cost?:number|null}|null>(null);
   const [view, setView] = useState<'today' | 'reports' | 'settings'>('today');
   const [selectedId, setSelectedId] = useState('');
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>(companies[0] ? [companies[0].id] : []);
@@ -78,6 +80,8 @@ export default function ResearchDesk({ companies }: { companies: ResearchCompany
   const runningRef = useRef(false);
   const pauseRef = useRef(false);
   const mountedRef = useRef(true);
+  const startingRef=useRef(false);
+  const pendingStartRef=useRef<{companyId:string;type?:ResearchType;question?:string}|null>(null);
   const selected = jobs.find(job => job.id === selectedId);
   const strategicSelected = selectedCompanies.some(id => isStrategicCompany(companies.find(company => company.id === id)));
   const dirty = !!selected?.report && editor !== (selected.editedText ?? reportText(selected));
@@ -141,18 +145,29 @@ export default function ResearchDesk({ companies }: { companies: ResearchCompany
     const now = new Date().toISOString();
     return { id: crypto.randomUUID(), companyIds, type: taskType, question: taskQuestion.trim(), status: 'queued', createdAt: now, updatedAt: now, day: today(), evidence: [], issues: [], collectedCompanyIds: [], ...extra };
   }
-  async function queueCustom(event: React.FormEvent) {
-    event.preventDefault();
-    if (dirty) { setMessage('احفظ التعديلات أو ألغِها قبل إضافة مهمة أخرى.'); return; }
-    if (!selectedCompanies.length || selectedCompanies.length > 3 || !question.trim()) return;
-    if (strategicSelected && type === 'results') { setMessage('الجهات غير المدرجة تُدرس بمهمة حدث أو مقارنة استراتيجية؛ لا تُنشأ لها نتائج ربعية.'); return; }
-    const duplicate = jobsRef.current.find(job => job.type === type && job.question.trim() === question.trim() && [...job.companyIds].sort().join() === [...selectedCompanies].sort().join() && ['queued', 'collecting', 'drafting', 'paused'].includes(job.status));
-    if (duplicate) { setSelectedId(duplicate.id); setMessage('هذه المهمة موجودة بالفعل في الطابور.'); return; }
-    try {
-      const job = await persist(makeJob(selectedCompanies, type, question));
-      setSelectedId(job.id); setMessage('أُضيفت المهمة. شغّلها منفردة أو شغّل الطابور بالترتيب.');
-    } catch { /* The storage warning explains the failed write. */ }
+  async function startImmediate(companyIds:string[],taskType:ResearchType,taskQuestion:string){
+    if(dirty){setMessage('احفظ التعديلات أو ألغِها قبل بدء دراسة أخرى.');return;}
+    if(!loaded||storageError){setMessage(storageError||'تُفتح مساحة الحفظ الآن. حاول بعد لحظة.');return;}
+    if(startingRef.current||runningRef.current){if(runningId)setSelectedId(runningId);setMessage('هناك دراسة قيد التنفيذ. يمكنك إيقافها مؤقتًا من التقرير.');return;}
+    if(!companyIds.length||companyIds.length>3||companyIds.some(id=>!companies.some(company=>company.id===id))||!taskQuestion.trim())return;
+    if(taskType==='results'&&companyIds.some(id=>isStrategicCompany(companies.find(company=>company.id===id)))){setMessage('الجهات غير المدرجة تُدرس استراتيجيًا، دون نتائج ربعية.');return;}
+    startingRef.current=true;
+    try{
+      setView('today');
+      const existing=jobsRef.current.find(job=>job.type===taskType&&job.question.trim()===taskQuestion.trim()&&[...job.companyIds].sort().join()===[...companyIds].sort().join()&&!job.report&&['queued','paused','failed','blocked'].includes(job.status));
+      const job=existing||await persist(makeJob(companyIds,taskType,taskQuestion));
+      setSelectedId(job.id);setEditing(false);setMessage('');
+      await runQueue(job.id);
+    }catch(error){setMessage(errorMessage(error));}finally{startingRef.current=false;}
   }
+  async function startRequested(detail:{companyId:string;type?:ResearchType;question?:string}){
+    const company=companies.find(item=>item.id===detail.companyId);if(!company)return;
+    const taskType=isStrategicCompany(company)&&detail.type==='results'?'event':detail.type||dailyType(company);
+    const taskQuestion=detail.question?.trim()||(isStrategicCompany(company)?STRATEGIC_QUESTION:DEFAULT_QUESTIONS[taskType]);
+    setSelectedCompanies([company.id]);setType(taskType);setQuestion(taskQuestion);setView('today');
+    await startImmediate([company.id],taskType,taskQuestion);
+  }
+  async function queueCustom(event:React.FormEvent){event.preventDefault();await startImmediate(selectedCompanies,type,question);}
   async function queueDaily() {
     if (dirty) { setMessage('احفظ التعديلات أو ألغِها قبل إضافة خطة اليوم.'); return; }
     try {
@@ -226,7 +241,7 @@ export default function ResearchDesk({ companies }: { companies: ResearchCompany
   async function newVersion(job: ResearchJob) {
     try {
       const next = await persist(makeJob(job.companyIds, job.type, job.question, { previousId: job.id, forceVersion: true }));
-      setSelectedId(next.id); setEditing(false); setView('today'); setMessage('أُضيفت نسخة جديدة مستقلة. تبقى النسخة السابقة محفوظة.');
+      setSelectedId(next.id); setEditing(false); setView('today'); setMessage(''); await runQueue(next.id);
     } catch { /* Storage error is displayed separately. */ }
   }
   async function saveEditor() {
@@ -262,21 +277,33 @@ export default function ResearchDesk({ companies }: { companies: ResearchCompany
     downloadFile(`drast-${job.id.slice(0, 8)}.${format}`, body, format === 'txt' ? 'text/plain;charset=utf-8' : 'application/json;charset=utf-8');
   }
 
+  useEffect(()=>{
+    const start=(event:Event)=>{const detail=(event as CustomEvent).detail;if(!detail||typeof detail.companyId!=='string')return;if(!loaded){pendingStartRef.current=detail;return;}void startRequested(detail);};
+    window.addEventListener('drast:start-research',start);
+    if(loaded&&pendingStartRef.current){const detail=pendingStartRef.current;pendingStartRef.current=null;void startRequested(detail);}
+    return()=>window.removeEventListener('drast:start-research',start);
+  },[loaded,storageError,dirty,provider,companies]);
+  async function testConnection(){
+    setTestingConnection(true);setConnectionTest(null);
+    try{const response=await fetch('/api/research/connection',{method:'POST'});const result=await response.json() as {ok?:boolean;error?:string;reply?:string;provider?:string;model?:string;cost?:number|null};if(!response.ok||!result.ok)throw new Error(result.error||'لم ينجح اختبار الاتصال بالنموذج.');setConnectionTest({ok:true,message:result.reply||'نجح اختبار توليد الرد.',provider:result.provider,model:result.model,cost:result.cost});await checkProvider();}
+    catch(error){setConnectionTest({ok:false,message:errorMessage(error)});}finally{setTestingConnection(false);}
+  }
+
   return <section className="research-desk" aria-label="مكتب البحث والدراسات">
     <div className="rd-toolbar">
       <div className="rd-tabs" role="group" aria-label="أقسام مكتب البحث">
-        <button className={view === 'today' ? 'active' : ''} onClick={() => setView('today')}><CalendarDays size={17}/>مكتب اليوم</button>
+        <button className={view === 'today' ? 'active' : ''} onClick={() => setView('today')}><CalendarDays size={17}/>بحث جديد</button>
         <button className={view === 'reports' ? 'active' : ''} onClick={() => setView('reports')}><FolderArchive size={17}/>المهام والتقارير<span>{nf.format(jobs.length)}</span></button>
         <button className={view === 'settings' ? 'active' : ''} onClick={() => setView('settings')}><HardDrive size={17}/>الحفظ والربط</button>
       </div>
-      <span className={`rd-provider-pill ${provider?.configured ? 'is-connected' : ''}`}><span/>{provider ? provider.configured ? 'الربط مهيّأ' : 'وضع جمع المصادر' : providerError ? 'تعذّر فحص الربط' : 'يتحقق من الربط'}</span>
+      <span className={`rd-provider-pill ${provider?.configured ? 'is-connected' : ''}`}><span/>{provider ? provider.configured ? 'متاح للتشغيل' : 'وضع جمع المصادر' : providerError ? 'تعذّر فحص الربط' : 'يتحقق من الربط'}</span>
     </div>
-    <div className="rd-local-note"><ShieldCheck size={17}/><p>مساحة خاصة · الحفظ في <strong>هذا المتصفح فقط</strong> دون مزامنة سحابية. إغلاق التبويب يوقف المهام غير المكتملة؛ تستأنفها عند العودة.</p><button onClick={() => setView('settings')}>نسخة احتياطية<ArrowLeft size={14}/></button></div>
+    {view==='settings'&&<div className="rd-local-note"><ShieldCheck size={17}/><p>مساحة خاصة · الحفظ في <strong>هذا المتصفح فقط</strong> دون مزامنة سحابية. إغلاق التبويب يوقف المهام غير المكتملة؛ تستأنفها عند العودة.</p><button onClick={() => setView('settings')}>نسخة احتياطية<ArrowLeft size={14}/></button></div>}
     {storageError && <div className="rd-alert error" role="alert"><TriangleAlert size={20}/><div><strong>الحفظ المحلي غير متاح</strong><p>{storageError} لم يبدأ أي تنفيذ جديد.</p></div><button className="btn secondary" onClick={() => location.reload()}>إعادة فتح</button></div>}
     {providerError && <div className="rd-alert" role="status"><TriangleAlert size={18}/><p>{providerError}</p><button onClick={checkProvider}>إعادة التحقق</button></div>}
     {message && <div className="rd-message" role="status"><CheckCircle2 size={18}/><span>{message}</span><button onClick={() => setMessage('')} aria-label="إغلاق التنبيه"><X size={17}/></button></div>}
     {!loaded ? <div className="rd-loading" role="status"><LoaderCircle className="spin"/>يفتح مكتب البحث المحفوظ في متصفحك…</div> : <>
-      {view === 'today' && <>
+      {view === 'today' && <details className="rd-advanced-options"><summary>خيارات البحث والخطة<ChevronDown size={16}/></summary><div className="rd-advanced-body">
         <div className="rd-stats">
           <div><span className="rd-stat-icon violet"><ListTodo size={20}/></span><span>بانتظار التشغيل<strong>{nf.format(pending.length)}<small>مهام</small></strong></span></div>
           <div><span className="rd-stat-icon mint"><FilePenLine size={20}/></span><span>مسودات دراسة اليوم<strong>{nf.format(completedToday)}<small>للمراجعة</small></strong></span></div>
@@ -299,21 +326,21 @@ export default function ResearchDesk({ companies }: { companies: ResearchCompany
             <label className="rd-label" htmlFor="rd-question">ما الذي تريد معرفته؟</label><textarea id="rd-question" value={question} onChange={event => setQuestion(event.target.value)} placeholder="مثال: ما أسباب تغير الأرباح؟ وهل يؤكد التدفق النقدي هذا التحسن؟" required maxLength={2000} rows={4}/>
             {strategicSelected && <p className="rd-small-note">الجهات غير المدرجة تُدرس استراتيجيًا عبر حدث أو مقارنة قطاعية، ولا تدخل في محرك الأرباع المالية.</p>}
             {type === 'event' && <p className="rd-small-note">اذكر الحدث وتاريخه في السؤال. المصادر المتاحة حاليًا تركز على الإفصاحات الرسمية؛ قد لا تشمل كل الأخبار.</p>}
-            <button type="submit" className="btn secondary rd-wide" disabled={!selectedCompanies.length || !question.trim() || !!storageError}><Plus size={17}/>إضافة مهمة مخصصة</button>
+            <button type="submit" className="btn secondary rd-wide" disabled={!selectedCompanies.length || !question.trim() || !!storageError || !!runningId}><Plus size={17}/>ابدأ الدراسة</button>
           </form>
         </div>
-      </>}
-      {(view === 'today' || view === 'reports') && <div className="rd-results-grid" id="research-queue">
+      </div></details>}
+      {(view === 'today' || view === 'reports') && <div className={`rd-results-grid ${view==='today'?'rd-direct-results':''}`} id="research-queue">
         <div className="rd-queue rd-panel">
           <div className="rd-section-heading"><div><span className="eyebrow">من السؤال إلى المسودة</span><h2>{view === 'reports' ? 'المهام والتقارير' : 'طابور البحث'}<small>{nf.format(view === 'reports' ? jobs.length : pending.length)}</small></h2></div>{runningId ? <button className="btn secondary compact" onClick={pause}><Pause size={15}/>إيقاف مؤقت</button> : <button className="btn primary compact" onClick={() => runQueue()} disabled={!pending.length || !!storageError}><Play size={15}/>تشغيل الطابور</button>}</div>
           {view === 'reports' && <div className="rd-queue-filters"><div className="rd-search"><Search size={16}/><input aria-label="البحث في المهام والتقارير" placeholder="ابحث بجهة أو سؤال…" value={search} onChange={event => setSearch(event.target.value)}/></div><select aria-label="تصفية حالة المهام" value={filter} onChange={event => setFilter(event.target.value)}><option value="all">جميع الحالات</option><option value="reports">تقارير محفوظة</option><option value="ready">مسودات AI</option><option value="sources_only">حصر مصادر</option><option value="queued">في الطابور</option><option value="paused">متوقفة مؤقتًا</option><option value="failed">تحتاج متابعة</option><option value="blocked">تحتاج مصادر</option></select></div>}
-          {!jobs.length ? <div className="rd-empty"><span><Inbox size={30}/></span><h3>مكتبك جاهز لأول مهمة</h3><p>أضف خطة اليوم أو اكتب سؤالًا مخصصًا. ستظهر خطوات البحث ومصادره هنا أثناء التنفيذ.</p></div> : !(view === 'reports' ? visibleJobs : jobs).length ? <div className="rd-empty"><Search size={25}/><p>لا توجد مهام تطابق البحث.</p></div> : <div className="rd-job-list">{(view === 'reports' ? visibleJobs : jobs).slice(0, view === 'reports' ? 1000 : 12).map(job => <button key={job.id} className={`rd-job ${selectedId === job.id ? 'selected' : ''}`} onClick={() => selectJob(job.id)} aria-pressed={selectedId === job.id}><span className={`rd-job-icon ${job.status}`}>{['collecting', 'drafting'].includes(job.status) ? <LoaderCircle size={20} className="spin"/> : job.report ? <FileText size={20}/> : job.status === 'no_change' ? <History size={20}/> : <Search size={20}/>}</span><span className="rd-job-copy"><strong>{job.companyIds.map(companyName).join('، ')}</strong><span>{job.report?.title || job.question}</span><small>{typeLabels[job.type]}<i/> {date(job.createdAt)}</small></span><span className="rd-job-end"><span className={`rd-status ${job.status}`}>{statusLabels[job.status]}</span><ChevronLeft size={17}/></span></button>)}</div>}
+          {!jobs.length ? <div className="rd-empty"><span><Inbox size={30}/></span><h3>مكتبك جاهز لأول مهمة</h3><p>ابحث باسم الجهة أو رمز التداول، ثم ابدأ الدراسة.</p></div> : !(view === 'reports' ? visibleJobs : jobs).length ? <div className="rd-empty"><Search size={25}/><p>لا توجد مهام تطابق البحث.</p></div> : <div className="rd-job-list">{(view === 'reports' ? visibleJobs : jobs).slice(0, view === 'reports' ? 1000 : 12).map(job => <button key={job.id} className={`rd-job ${selectedId === job.id ? 'selected' : ''}`} onClick={() => selectJob(job.id)} aria-pressed={selectedId === job.id}><span className={`rd-job-icon ${job.status}`}>{['collecting', 'drafting'].includes(job.status) ? <LoaderCircle size={20} className="spin"/> : job.report ? <FileText size={20}/> : job.status === 'no_change' ? <History size={20}/> : <Search size={20}/>}</span><span className="rd-job-copy"><strong>{job.companyIds.map(companyName).join('، ')}</strong><span>{job.report?.title || job.question}</span><small>{typeLabels[job.type]}<i/> {date(job.createdAt)}</small></span><span className="rd-job-end"><span className={`rd-status ${job.status}`}>{statusLabels[job.status]}</span><ChevronLeft size={17}/></span></button>)}</div>}
           {view === 'today' && jobs.length > 12 && <button className="rd-all-link" onClick={() => setView('reports')}>عرض جميع المهام والتقارير<ArrowLeft size={15}/></button>}
           <div className="rd-queue-foot"><ShieldCheck size={14}/>{runningId ? 'اترك هذا التبويب مفتوحًا حتى تنتهي المهمة.' : 'كل مسودة تحتفظ بالسؤال والمصادر وتاريخ الجمع.'}</div>
         </div>
         <div className="rd-detail rd-panel" aria-label="تفاصيل المهمة والتقرير">
-          {!selected ? <div className="rd-detail-empty"><div className="rd-doc-illustration"><FileText size={46}/><span><Check size={18}/></span></div><span className="eyebrow">التفاصيل تصنع الفرق</span><h2>بحث يمكن الرجوع إليه</h2><p>اختر مهمة لعرض خطواتها، وراجع الأدلة، ثم حرّر المسودة واطبع تقريرك من مكان واحد.</p><div><span><BookOpen size={16}/>مصادر مرتبطة</span><span><FilePenLine size={16}/>تحرير داخل المنصة</span><span><Printer size={16}/>جاهز للطباعة</span></div></div> : <>
-            <div className="rd-detail-header"><div><span className={`rd-status ${selected.status}`}>{statusLabels[selected.status]}</span><h2>{selected.report?.title || selected.companyIds.map(companyName).join('، ')}</h2><p>{typeLabels[selected.type]} · {date(selected.createdAt)}</p></div>{!['collecting', 'drafting'].includes(selected.status) && <button className="rd-icon-button" aria-label="حذف المهمة" title="حذف المهمة" onClick={() => setDeleteId(selected.id)}><X size={17}/></button>}</div>
+          {!selected ? <div className="rd-detail-empty"><div className="rd-doc-illustration"><FileText size={46}/><span><Check size={18}/></span></div><span className="eyebrow">تقريرك في مكان واحد</span><h2>ابدأ بالاسم أو رمز التداول</h2><p>اختر جهة من البحث أعلاه واضغط «ابدأ الدراسة».</p><div><span><BookOpen size={16}/>مصادر مرتبطة</span><span><FilePenLine size={16}/>تحرير داخل المنصة</span><span><Printer size={16}/>جاهز للطباعة</span></div></div> : <>
+            <div className="rd-detail-header"><div><span className={`rd-status ${selected.status}`}>{statusLabels[selected.status]}</span><h2>{selected.report?.title || selected.companyIds.map(companyName).join('، ')}</h2><p>{typeLabels[selected.type]} · {date(selected.createdAt)}</p></div>{selected.id===runningId&&<button className="btn secondary compact" onClick={pause}><Pause size={14}/>إيقاف مؤقت</button>}{!['collecting', 'drafting'].includes(selected.status) && <button className="rd-icon-button" aria-label="حذف المهمة" title="حذف المهمة" onClick={() => setDeleteId(selected.id)}><X size={17}/></button>}</div>
             {deleteId === selected.id && <div className="rd-delete-confirm" role="alert"><p>حذف هذه المهمة ومصادرها وتقريرها من هذا المتصفح؟</p><button onClick={() => deleteJob(selected.id)}>تأكيد الحذف</button><button onClick={() => setDeleteId('')}>إلغاء</button></div>}
             <div className="rd-question"><span>سؤال البحث</span><p>{selected.question}</p></div>
             <div className="rd-process"><div className={selected.collectedCompanyIds.length ? 'done' : ['collecting'].includes(selected.status) ? 'current' : ''}><span>{selected.collectedCompanyIds.length ? <Check size={13}/> : '١'}</span><strong>جمع الأدلة</strong><small>{nf.format(selected.evidence.length)} مصدر</small></div><span className="rd-process-line"/><div className={selected.report ? 'done' : selected.status === 'drafting' ? 'current' : ''}><span>{selected.report ? <Check size={13}/> : '٢'}</span><strong>{selected.mode === 'sources_only' ? 'حصر المصادر' : 'صياغة المسودة'}</strong><small>{selected.mode === 'ai' ? 'نموذج AI' : selected.mode === 'sources_only' ? 'دون نموذج AI' : 'بعد اكتمال الجمع'}</small></div><span className="rd-process-line"/><div className={selected.editedAt ? 'done' : ''}><span>{selected.editedAt ? <Check size={13}/> : '٣'}</span><strong>مراجعتك</strong><small>{selected.editedAt ? 'حُفظت التعديلات' : 'لم تُسجل تعديلات'}</small></div></div>
@@ -328,12 +355,13 @@ export default function ResearchDesk({ companies }: { companies: ResearchCompany
               {selected.model && <div className="rd-model-caption">النموذج المستخدم: <span dir="ltr">{selected.model}</span></div>}
               <button className="rd-all-link" onClick={() => newVersion(selected)} disabled={dirty || !!storageError}><RefreshCw size={14}/>طلب إصدار جديد مع إبقاء هذه النسخة</button>
             </>}
+            {selected.report&&renderFinancialCharts?.(selected.companyIds)}
             {(selected.evidence.length > 0 || selected.issues.length > 0) && <details className="rd-evidence" open={!selected.report}><summary><BookOpen size={17}/>الأدلة وحدود الجمع<span>{nf.format(selected.evidence.length)}</span><ChevronDown size={15}/></summary><div>{selected.evidence.map(source => <div className="rd-evidence-item" key={source.id}><div><span>{source.kind === 'pdf' ? 'PDF' : 'WEB'}</span><strong>{source.title}</strong></div>{isSafeSourceUrl(source.url) ? <a href={source.url} target="_blank" rel="noopener noreferrer">فتح المصدر الأصلي<ExternalLink size={13}/></a> : <span>رابط المصدر غير متاح للفتح</span>}<p>{source.text.slice(0, 200)}{source.text.length > 200 ? '…' : ''}</p><small>جُمع: {date(source.checkedAt)}{source.pagesRead ? ` · قُرئت ${nf.format(source.pagesRead)} من ${nf.format(source.totalPages || source.pagesRead)} صفحات` : ''}{source.truncated ? ' · النص مقتطف وغير كامل' : ''}</small></div>)}{selected.issues.length > 0 && <div className="rd-collection-issues"><strong><TriangleAlert size={15}/>ملاحظات الجمع</strong><ul>{selected.issues.map((issue, i) => <li key={i}>{issue}</li>)}</ul></div>}</div></details>}
           </>}
         </div>
       </div>}
       {view === 'settings' && <div className="rd-settings">
-        <div className="rd-panel rd-connection"><div className="rd-section-heading"><div><span className="eyebrow">ربط مستقل للمشروع</span><h2>نموذج الذكاء الاصطناعي</h2></div><span className="rd-light-icon"><Sparkles size={24}/></span></div><div className={`rd-connection-state ${provider?.configured ? 'connected' : ''}`}><span/>{provider ? provider.configured ? 'المفتاح مضاف · الاتصال يُختبر عند التنفيذ' : 'لم يُضف مفتاح النموذج بعد' : 'حالة الربط غير متاحة'}</div><p>المصادر تُجمع من الروابط المعتمدة. وجود المفتاح يهيّئ الربط؛ تُختبر صلاحيته عند التنفيذ. تُرسل إلى النموذج المادة المجمّعة لإعداد مسودة موثقة، ولا يغادر سجل مهامك المتصفح للحفظ.</p><dl><div><dt>المزوّد</dt><dd>OpenRouter</dd></div><div><dt>النموذج</dt><dd dir="ltr">{provider?.model || 'يُحدد في إعدادات الخادم'}</dd></div><div><dt>سياسة التكلفة</dt><dd>نماذج مجانية فقط · دون انتقال تلقائي إلى نموذج مدفوع</dd></div><div><dt>الوضع الحالي</dt><dd>{provider ? provider.configured ? 'جاهز لطلب مسودة AI؛ يتوقف عند تعذّر اتصال المزوّد' : 'حصر المصادر فقط؛ لا تُحتسب دراسة مكتملة' : 'غير معروف؛ أعد التحقق من الربط'}</dd></div></dl><p className="rd-small-note">يُضاف المفتاح في إعدادات استضافة هذا المشروع. لا تضع المفاتيح السرية في التقرير أو ملفات النسخ الاحتياطية.</p><button className="btn secondary" onClick={checkProvider}><RefreshCw size={16}/>التحقق من حالة الربط</button></div>
+        <div className="rd-panel rd-connection"><div className="rd-section-heading"><div><span className="eyebrow">ربط مستقل للمشروع</span><h2>نموذج الذكاء الاصطناعي</h2></div><span className="rd-light-icon"><Sparkles size={24}/></span></div><div className={`rd-connection-state ${provider?.configured ? 'connected' : ''}`}><span/>{provider ? provider.configured ? 'الإعداد متاح · الاتصال يُختبر عند التنفيذ' : 'لم يُهيّأ نموذج للتوليد بعد' : 'حالة الربط غير متاحة'}</div><p>تُرسل المادة المجمّعة إلى المزوّد المحدد لإعداد المسودة عند نجاح الاتصال. إعداد الربط وحده لا يؤكد نجاح التوليد.</p><dl><div><dt>المزوّد</dt><dd>{provider?.provider||'غير محدد'}</dd></div><div><dt>النموذج</dt><dd dir="ltr">{provider?.model || 'يُحدد في إعدادات الخادم'}</dd></div><div><dt>سياسة التكلفة</dt><dd>نماذج مجانية فقط · دون انتقال تلقائي إلى نموذج مدفوع</dd></div><div><dt>الوضع الحالي</dt><dd>{provider ? provider.configured ? 'جاهز لطلب مسودة AI؛ يتوقف عند تعذّر اتصال المزوّد' : 'حصر المصادر فقط؛ لا تُحتسب دراسة مكتملة' : 'غير معروف؛ أعد التحقق من الربط'}</dd></div></dl><p className="rd-small-note">تُحدد طريقة الربط في إعدادات هذا المشروع، وقد تستخدم صلاحيات الاستضافة أو مفتاح مزوّد اختياريًا. لا تُحفظ بيانات الربط السرية ضمن التقارير.</p><div className="rd-connection-actions"><button className="btn primary" onClick={testConnection} disabled={testingConnection}>{testingConnection?<LoaderCircle className="spin" size={16}/>:<Sparkles size={16}/>}اختبار الاتصال</button><button className="btn secondary" onClick={checkProvider}><RefreshCw size={16}/>تحديث الحالة</button></div>{connectionTest&&<div className={`rd-connection-test ${connectionTest.ok?'success':'error'}`} role="status">{connectionTest.ok?<CheckCircle2 size={17}/>:<TriangleAlert size={17}/>}<div><strong>{connectionTest.ok?'نجح اختبار التوليد':'لم ينجح الاتصال'}</strong><p>{connectionTest.message}</p>{connectionTest.ok&&<small>{connectionTest.provider} · <bdi>{connectionTest.model}</bdi>{connectionTest.cost===0?' · التكلفة المبلّغة: 0 دولار':''}</small>}</div></div>}</div>
         <div className="rd-panel rd-backup"><div className="rd-section-heading"><div><span className="eyebrow">نسختك تحت يدك</span><h2>الحفظ والنسخ الاحتياطي</h2></div><span className="rd-light-icon mint"><HardDrive size={24}/></span></div><div className="rd-backup-count"><strong>{nf.format(jobs.length)}</strong><span>مهمة محفوظة في هذا المتصفح<br/>{nf.format(reportJobs.length)} مسودة أو حصر مصادر</span></div><p>البيانات لا تتزامن بين الأجهزة. حذف بيانات الموقع أو استخدام متصفح آخر قد يُخفي سجلك؛ صدّر نسخة دورية لاستعادتها.</p><div className="rd-backup-actions"><button className="btn primary" disabled={!!storageError || !jobs.length} onClick={() => downloadFile(`drast-backup-${today()}.json`, JSON.stringify({ schemaVersion: 1, exportedAt: new Date().toISOString(), jobs: jobsRef.current }, null, 2))}><Download size={17}/>تصدير النسخة الكاملة</button><button className="btn secondary" onClick={() => inputRef.current?.click()} disabled={!!storageError || !!runningId}><Upload size={17}/>استعادة نسخة</button><input type="file" ref={inputRef} accept=".json,application/json" hidden onChange={event => { const file = event.target.files?.[0]; if (file) restoreBackup(file); event.target.value = ''; }}/></div><p className="rd-small-note">الاستعادة تضيف المهام الجديدة فقط، وتبقي نسختك الحالية. النسخة تتضمن نصوص المصادر والتقارير؛ احتفظ بها في مكان خاص.</p></div>
         <div className="rd-panel rd-scope"><span className="eyebrow">بداية قابلة للتوسع</span><h2>قائمة المتابعة</h2><p>{nf.format(companies.length)} جهات في المتابعة، لكل منها سجل مستقل. تُقترح مهام يومية بحسب تاريخ الدراسات، ويمكنك تحديد جهة أو حتى ثلاث جهات في مهمة واحدة.</p><div>{companies.map(company => <div key={company.id}><span className={`rd-company-initial ${company.id}`}>{company.name.replace('ال', '').slice(0, 1)}</span><strong>{company.name}</strong><span>{company.sector}</span><small>{company.ticker}</small></div>)}</div></div>
       </div>}

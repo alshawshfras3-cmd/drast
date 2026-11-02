@@ -369,3 +369,28 @@
 .rd-evidence-item > small { color: #8a7298; }
 .rd-evidence-item a, .rd-citation-links a { color: #85619e; }
 .rd-detail { scroll-margin-top: 130px; }
+
+/* Direct research stays ahead of the optional planning controls. */
+.rd-advanced-options { border: 1px solid #e9e0f1; background: #fcf9ff; border-radius: 11px; margin: 0 0 18px; }
+.rd-advanced-options > summary { display: flex; align-items: center; gap: 9px; padding: 12px 16px; color: #a288b5; font-size: 11px; cursor: pointer; list-style: none; }
+.rd-advanced-options > summary::-webkit-details-marker { display: none; }
+.rd-advanced-options > summary > svg { margin-right: auto; }
+.rd-advanced-options[open] > summary > svg { transform: rotate(180deg); }
+.rd-advanced-body { padding: 16px; border-top: 1px solid #eee4f6; }
+.rd-advanced-body .rd-work-grid { margin-bottom: 0; }
+.rd-direct-results { grid-template-columns: 1fr; }
+.rd-direct-results > .rd-queue { display: none; }
+.rd-direct-results .rd-detail-empty { min-height: 270px; }
+.rd-direct-results .rd-detail-empty .rd-doc-illustration { width: 70px; height: 76px; margin-bottom: 22px; }
+.rd-direct-results .rd-detail-empty .rd-doc-illustration > svg { width: 34px; height: 34px; }
+.rd-direct-results .rd-detail-header h2 { font-size: 23px; }
+.rd-direct-results .rd-report { max-width: 100%; }
+.rd-direct-results .rd-report section { max-width: 100%; }
+.rd-connection-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+.rd-connection-test { display: flex; align-items: flex-start; gap: 9px; padding: 14px; margin-top: 16px; border: 1px solid #dcecdf; background: #f4fbf4; color: #87a88f; border-radius: 9px; }
+.rd-connection-test > svg { margin-top: 3px; }
+.rd-connection-test strong { font-size: 12px; font-weight: 500; }
+.rd-connection-test p { font-size: 12px; margin-top: 3px; }
+.rd-connection-test small { display: block; font-size: 9px; margin-top: 6px; overflow-wrap: anywhere; }
+.rd-connection-test.error { border-color: #f0d6df; background: #fff6f8; color: #b37e93; }
+@media(max-width:650px) { .rd-advanced-body { padding: 11px; } .rd-advanced-options > summary { font-size: 10px; padding: 11px 13px; } .rd-direct-results .rd-detail-header h2 { font-size: 19px; } .rd-direct-results .rd-detail-empty { min-height: 240px; } .rd-direct-results .rd-detail-empty > div:last-child { display: none; } }

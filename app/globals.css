@@ -778,3 +778,45 @@ tbody th,thead th{font-size:13px;color:#63516f}
 .research-desk .rd-scope > div { grid-template-columns: repeat(auto-fit,minmax(155px,1fr)); }
 @media(max-width:900px) { .institution-directory { padding: 23px; } .institution-directory-grid { gap: 13px; } .institution-card { padding: 18px; } .institution-card-top { flex-direction: column; align-items: flex-start; gap: 10px; } .institution-card h3 { font-size: 17px; } }
 @media(max-width:650px) { .institution-directory { padding: 20px; margin-top: 25px; border-radius: 15px; } .institution-directory-heading { align-items: flex-start; flex-direction: column; gap: 12px; } .institution-directory-heading h2 { font-size: 21px; } .institution-directory-status { font-size: 9px; padding: 5px 7px; } .institution-directory-description { font-size: 11px; } .institution-directory-grid { grid-template-columns: 1fr; gap: 13px; margin-top: 19px; } .institution-card { padding: 20px; } .institution-card-top { flex-direction: row; align-items: center; margin-bottom: 14px; } .institution-card-access { margin: 16px 0; } .research-desk .rd-scope > div { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+
+/* Start research directly from the existing banner. */
+.workspace-hero.research-hero { overflow: visible; }
+.research-hero::after { display: none; }
+.hero-research-launch { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 9px; max-width: 580px; position: relative; }
+.hero-entity-search { display: flex; align-items: center; gap: 9px; background: #fff; border: 1px solid #ddcbe9; border-radius: 9px; min-width: 0; padding: 0 12px; color: #a284b8; position: relative; }
+.hero-entity-search > input { color: #6f4d86; width: 100%; min-width: 0; background: none; border: 0; padding: 11px 0; font-size: 12px; min-height: 46px; }
+.hero-entity-search > input::placeholder { color: #b299c3; }
+.hero-clear-search { display: flex; align-items: center; justify-content: center; background: none; border: 0; padding: 2px; color: #a587b7; }
+.hero-company-options { position: absolute; z-index: 50; top: calc(100% + 7px); left: 0; right: 0; border-radius: 11px; border: 1px solid #e1d3ed; background: #fff; box-shadow: 0 14px 35px #30144925; max-height: 270px; overflow-y: auto; }
+.hero-company-options > button { display: flex; align-items: center; justify-content: space-between; gap: 13px; width: 100%; padding: 11px 13px; border: 0; border-bottom: 1px solid #f2ebf7; background: #fff; color: #7d5c94; text-align: right; font-size: 12px; }
+.hero-company-options > button:hover, .hero-company-options > button:focus-visible { background: #faf4ff; }
+.hero-company-options small { display: block; color: #ab91bb; font-size: 9px; margin-top: 2px; }
+.hero-company-options bdi { color: #a283b7; font-size: 10px; flex-shrink: 0; }
+.hero-company-options > p { color: #8c729d; font-size: 11px; padding: 15px; line-height: 1.9; }
+.research-hero .hero-research-launch > .primary { background: #e4cff8; color: #5b337b; border-color: #e4cff8; font-size: 12px; padding: 10px 15px; min-height: 46px; white-space: nowrap; }
+.research-hero .hero-research-launch > .primary:hover { background: #f3e7ff; }
+.hero-launch-selection { display: flex; align-items: center; gap: 13px; justify-content: space-between; grid-column: 1 / -1; font-size: 10px; color: #bda4d3; padding: 3px 1px 0; }
+.hero-launch-selection strong { color: #ddcaec; font-weight: 500; }
+.hero-launch-selection > button { border: 0; background: none; font-size: 10px; padding: 0; color: #d5b9ec; flex-shrink: 0; }
+.financial-chart-heading > label { position: relative; display: flex; align-items: center; flex-shrink: 0; }
+.financial-chart-heading select { appearance: none; border: 1px solid #e7d9ef; border-radius: 7px; color: #9471a8; background: #fcf8ff; padding: 6px 10px 6px 25px; font-size: 10px; min-height: 34px; max-width: 165px; }
+.financial-chart-heading > label > svg { position: absolute; left: 8px; color: #ad91bf; pointer-events: none; }
+.financial-chart .financial-chart-heading h3 { color: #79518f; font-size: 17px; }
+.financial-chart .financial-chart-heading p { color: #a086af; font-size: 10px; }
+.financial-chart .chart-wrap svg { display: block; width: 100%; height: auto; }
+.financial-chart-empty { min-height: 180px; padding: 35px 15px; color: #ad92be; font-size: 12px; }
+.financial-chart-values { padding-top: 10px; border-top: 1px solid #efe4f6; }
+.financial-chart-values > summary { display: flex; align-items: center; gap: 6px; color: #ab8dbf; font-size: 10px; cursor: pointer; list-style: none; }
+.financial-chart-values > summary::-webkit-details-marker { display: none; }
+.financial-chart-values > div { display: flex; flex-wrap: wrap; gap: 10px 20px; padding-top: 12px; }
+.financial-chart-values > div > span { display: flex; gap: 10px; color: #a88abb; font-size: 10px; }
+.financial-chart-values strong { color: #865c9c; font-weight: 500; }
+.report-financial-chart { padding: 22px; margin-top: 25px; border: 1px solid #e8dbf1; background: #fdfbff; border-radius: 12px; }
+.report-financial-provenance { display: flex; align-items: flex-start; gap: 10px; padding-bottom: 16px; margin-bottom: 17px; border-bottom: 1px solid #eee2f5; color: #a386b6; }
+.report-financial-provenance > svg { margin-top: 3px; }
+.report-financial-provenance > span { flex: 1; }
+.report-financial-provenance strong { display: block; color: #8b649f; font-size: 12px; font-weight: 500; }
+.report-financial-provenance small { display: block; color: #ae94be; font-size: 9px; margin-top: 3px; line-height: 1.9; }
+.report-financial-provenance > button { display: flex; align-items: center; gap: 5px; background: none; border: 0; color: #a180b6; font-size: 9px; flex-shrink: 0; padding: 2px 0; }
+@media(max-width:760px) { .hero-research-launch { max-width: 100%; } .hero-launch-selection { font-size: 9px; } .hero-company-options { max-height: 230px; } .report-financial-chart { padding: 17px; } .report-financial-provenance { flex-wrap: wrap; } .report-financial-provenance > button { margin-right: 28px; } }
+@media(max-width:450px) { .hero-research-launch { grid-template-columns: minmax(0,1fr); } .hero-launch-selection { font-size: 8px; gap: 8px; } .hero-launch-selection > button { font-size: 8px; } .research-hero .hero-research-launch > .primary { min-height: 41px; justify-content: center; } .hero-entity-search > input { font-size: 11px; min-height: 43px; } .financial-chart-heading { align-items: flex-start; flex-wrap: wrap; gap: 10px; } .financial-chart-heading select { min-height: 31px; } }
