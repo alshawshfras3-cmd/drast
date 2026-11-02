@@ -16,6 +16,7 @@ test('request policy overrides cost parameters and removes paid tools/fallbacks'
   assert.deepEqual(body.provider, { max_price: { prompt: 0, completion: 0, request: 0 }, allow_fallbacks: false });
   assert.deepEqual(body.plugins, []);
   assert.equal(body.tools, undefined); assert.equal(body.models, undefined); assert.equal(body.model, 'openrouter/free');
+  assert.deepEqual(freeRequestBody({}, 'nvidia/nemotron-3.5-lightning:free').reasoning, { enabled: false });
 });
 test('model response must contain an entire JSON object, never prose or a partial object', () => {
   assert.deepEqual(parseReportJson('```json\n{"title":"test"}\n```'), { title: 'test' });

@@ -56,6 +56,9 @@ export function researchError(error: unknown): { message: string; status: number
   if (String((error as any)?.message || '').includes('FREE_MODEL_')) return { status: 503, message: 'المسار المجاني غير متاح أو تغير سعره. توقفت الصياغة دون استخدام بديل مدفوع.' };
   if (diagnostic.includes('customer_verification_required')) return { status: 503, message: 'يتطلب حساب Vercel اعتماد الوصول إلى AI Gateway قبل تشغيل النموذج. لم تُفعّل مدفوعات أو تعبئة رصيد تلقائية.' };
   const code = (error as any)?.statusCode;
+  if (diagnostic.includes('REPORT_TRUNCATED')) return { status: 422, message: 'بلغ رد النموذج حد الإخراج قبل اكتماله. لم تُعتمد مسودة ناقصة؛ المصادر محفوظة.' };
+  if (diagnostic.includes('MODEL_EMPTY_RESPONSE')) return { status: 422, message: 'لم يُرجع المزوّد نصًا قابلًا للقراءة. لم يتأكد نجاح الاتصال بالنموذج.' };
+  if (code === 400) return { status: 422, message: 'رفض المزوّد إعدادات طلب النموذج. يلزم تعديل الربط؛ لا حاجة إلى شحن رصيد لهذا الخطأ.' };
   if (code === 429) return { status: 429, message: 'بلغ النموذج المجاني حد الاستخدام أو تعذر توفره مؤقتًا. حُفظت المصادر؛ أعد المحاولة لاحقًا. لن ينتقل النظام إلى نموذج مدفوع.' };
   if (code === 401 || code === 403 || diagnostic.includes('VERCEL_OIDC_MISSING') || diagnostic.includes('MODEL_NOT_CONFIGURED')) return { status: 503, message: 'تعذر اعتماد الاتصال بالنموذج لهذا المشروع. راجع هوية Vercel للمشروع أو أضف مفتاح OpenRouter مخصصًا في إعدادات الاستضافة.' };
   if (code === 402 || code === 404 || code === 502 || code === 503) return { status: 503, message: 'لا يتوفر مسار مجاني مناسب الآن. حُفظت المصادر ولم يُستخدم بديل مدفوع.' };
