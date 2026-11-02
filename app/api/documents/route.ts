@@ -1,4 +1,33 @@
-import {env} from 'cloudflare:workers';
-import {actor,response,originAllowed,readDocument} from '@/lib/repository';
-export async function GET(request:Request){const owner=actor(request);if(!owner)return response({error:'يلزم تسجيل الدخول.'},401);const id=new URL(request.url).searchParams.get('id');if(!id)return response({error:'حدد المستند.'},400);const doc=await readDocument(owner,id);if(!doc)return response({error:'المستند غير موجود.'},404);if(new URL(request.url).searchParams.get('download')==='true'){const file=await env.BUCKET!.get(`documents/${owner}/${id}`);if(!file)return response({error:'الملف غير موجود.'},404);return new Response(file.body,{headers:{'Content-Type':String(doc.mime||'application/octet-stream'),'Content-Disposition':`attachment; filename*=UTF-8''${encodeURIComponent(String(doc.name))}`,'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'}})}return response(doc)}
-export async function POST(request:Request){const owner=actor(request);if(!owner)return response({error:'يلزم تسجيل الدخول.'},401);if(!originAllowed(request))return response({error:'مصدر الطلب غير مسموح.'},403);if(Number(request.headers.get('content-length')||0)>17*1024*1024)return response({error:'الحد الأقصى 15 ميجابايت.'},413);try{const f=await request.formData();const file=f.get('file');if(!(file instanceof File)||file.size>15*1024*1024||!file.size)return response({error:'ارفع ملفًا صالحًا حتى 15 ميجابايت.'},400);if(!/\.(pdf|txt|csv|json)$/i.test(file.name))return response({error:'الأنواع المدعومة: PDF وTXT وCSV وJSON.'},400);const id=crypto.randomUUID();const key=`documents/${owner}/${id}`;const text=String(f.get('text')||'');if(new TextEncoder().encode(text).byteLength>3*1024*1024)return response({error:'النص المستخرج كبير جدًا؛ قسّم التقرير.'},400);const company=String(f.get('company')||'').slice(0,200),ticker=String(f.get('ticker')||'').slice(0,20),period=String(f.get('period')||'').slice(0,30);const pageCount=Math.max(0,Math.min(1000,Number(f.get('pageCount'))||0));const status=text.replace(/\[صفحة \d+\]/g,'').replace(/\s/g,'').length>30?'text_ready':'needs_ocr';await env.BUCKET!.put(key,file.stream(),{httpMetadata:{contentType:file.type||'application/octet-stream'}});await env.BUCKET!.put(key+'.txt',text);await env.DB!.prepare('INSERT INTO documents (owner_id,id,name,company,ticker,period,mime,size,storage_key,text_key,page_count,extraction_status,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)').bind(owner,id,file.name.slice(0,250),company,ticker,period,file.type,file.size,key,key+'.txt',pageCount,status,new Date().toISOString()).run();return response({id,name:file.name,company,ticker,period,size:file.size,pageCount,extractionStatus:status});}catch{return response({error:'تعذّر حفظ الملف. أعد المحاولة.'},500)}}
+import { actor, response, originAllowed, readDocument, readFile, saveDocument } from '@/lib/repository';
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export async function GET(request: Request) {
+  const owner = actor(request);
+  if (!owner) return response({ error: 'يلزم الدخول إلى المساحة المحمية.' }, 401);
+  const url = new URL(request.url), id = url.searchParams.get('id');
+  if (!id) return response({ error: 'حدد المستند.' }, 400);
+  try {
+    if (url.searchParams.get('download') === 'true') {
+      const result = await readFile(owner, id);
+      if (!result?.file || result.file.statusCode !== 200) return response({ error: 'الملف غير موجود.' }, 404);
+      return new Response(result.file.stream, { headers: {
+        'Content-Type': result.doc.mime || 'application/octet-stream',
+        'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(result.doc.name)}`,
+        'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff',
+      } });
+    }
+    const doc = await readDocument(owner,id);
+    return doc ? response(doc) : response({ error: 'المستند غير موجود.' },404);
+  } catch { console.error('document_read_failed'); return response({ error: 'تعذّرت قراءة التقرير.' },503); }
+}
+export async function POST(request: Request) {
+  const owner = actor(request);
+  if (!owner) return response({ error: 'يلزم الدخول إلى المساحة المحمية.' },401);
+  if (!originAllowed(request)) return response({ error: 'مصدر الطلب غير مسموح.' },403);
+  if (Number(request.headers.get('content-length') || 0) > 4 * 1024 * 1024) return response({ error: 'بيانات التقرير كبيرة جدًا.' },413);
+  try {
+    const body = await request.text();
+    if (new TextEncoder().encode(body).length > 4 * 1024 * 1024) return response({ error: 'بيانات التقرير كبيرة جدًا.' },413);
+    return response(await saveDocument(owner, JSON.parse(body)));
+  } catch(e) { return response({ error: e instanceof Error ? e.message : 'تعذّر حفظ التقرير.' },400); }
+}
