@@ -21,6 +21,14 @@ const report = (overrides = {}) => ({
 });
 const throwsCode = (fn, code) => assert.throws(fn, error => error instanceof TypeError && error.code === code);
 
+test('known collection dates beside financial text are metadata while unsupported amounts still fail', () => {
+  const item = evidence({checkedAt:'2026-11-03T00:00:00Z'});
+  const valid = report({summary:'مراجعة إيرادات الشركة؛ وقت الجلب 2026-11-03T00:00:00Z.',limitations:['جلبت مصادر الإيرادات في 2026-11-03؛ لا يثبت ذلك تاريخ نشرها.']});
+  assert.match(validateResearchReport(valid,[item]).summary,/2026-11-03/);
+  throwsCode(() => validateResearchReport({...valid,summary:valid.summary+' إيرادات 987654321 مليون ريال.'},[item]),'UNSUPPORTED_FINANCIAL_NUMBER');
+  throwsCode(() => validateResearchReport({...valid,summary:'إيرادات 2026-11-03 مليون ريال.'},[item]),'UNSUPPORTED_FINANCIAL_NUMBER');
+});
+
 test('request has a bounded known scope and does not coerce unsupported types', () => {
   const result = normalizeResearchRequest({companyIds:['hmg', 'aramco']});
   assert.equal(result.type, 'results');

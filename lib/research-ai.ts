@@ -62,7 +62,11 @@ export function researchError(error: unknown): { message: string; status: number
     INVALID_TEXT_LENGTH: 'لم تُعتمد المسودة لأن أحد نصوصها تجاوز الحجم المطلوب.',
     INVALID_REPORT_JSON: 'رد النموذج لم يطابق صيغة التقرير المطلوبة؛ لم تُعتمد المسودة.',
   };
-  if (validationMessages[validationCode]) return {status:422,message:validationMessages[validationCode]};
+  if (validationMessages[validationCode]) {
+    const detail = validationCode === 'UNSUPPORTED_FINANCIAL_NUMBER' ? (error as any)?.details : null;
+    const locator = detail && /^(القسم \d{1,2}|الخلاصة|القيود والمتابعة)$/.test(detail.field) && /^[+\-\d.,]{1,40}$/.test(detail.token) ? ` الموضع: ${detail.field}؛ الرقم المرفوض: ${detail.token}.` : '';
+    return {status:422,message:validationMessages[validationCode] + locator};
+  }
   const diagnostic = [String((error as any)?.message || ''), String((error as any)?.type || ''), String((error as any)?.cause?.message || ''), String((error as any)?.cause?.responseBody || '')].join(' ');
   if (String((error as any)?.message || '').includes('FREE_MODEL_')) return { status: 503, message: 'المسار المجاني غير متاح أو تغير سعره. توقفت الصياغة دون استخدام بديل مدفوع.' };
   if (diagnostic.includes('customer_verification_required')) return { status: 503, message: 'يتطلب حساب Vercel اعتماد الوصول إلى AI Gateway قبل تشغيل النموذج. لم تُفعّل مدفوعات أو تعبئة رصيد تلقائية.' };
