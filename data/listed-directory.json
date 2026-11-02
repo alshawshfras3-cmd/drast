@@ -1,0 +1,2561 @@
+{
+  "asOf": "2026-11-03",
+  "asOfMeaning": "retrieval_date_not_source_update_date",
+  "sourceUrl": "https://www.saudiexchange.sa/wps/portal/saudiexchange/rules-guidance/capital-market-overview/Restrictions-Periods-and-Financials-Deadline",
+  "sourceTitle": "Saudi Exchange — Restriction Periods and Financials Deadlines",
+  "sourceLanguage": "en",
+  "sourceAsOf": null,
+  "coverage": "لقطة هوية تضم 376 شركة من جداول الشركات في السوق الرئيسية ونمو على صفحة تداول الرسمية كما ظهرت في النص المقروء بتاريخ 3 نوفمبر 2026. لا تتضمن صناديق REIT أو ETF أو الصناديق المغلقة، ولا أسعارًا أو بيانات مالية أو قطاعات. تاريخ آخر تحديث للقائمة غير مثبت؛ لا يُدّعى اكتمال تغييرات الإدراج أو الأسماء حتى تاريخ القراءة.",
+  "completeness": "source_snapshot_not_live_directory",
+  "companies": [
+    {
+      "name": "Riyad Bank",
+      "ticker": "1010",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "بنك الرياض"
+      ]
+    },
+    {
+      "name": "Bank Aljazira",
+      "ticker": "1020",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "بنك الجزيرة"
+      ]
+    },
+    {
+      "name": "Saudi Investment Bank",
+      "ticker": "1030",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "البنك السعودي للاستثمار"
+      ]
+    },
+    {
+      "name": "Banque Saudi Fransi",
+      "ticker": "1050",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "البنك السعودي الفرنسي"
+      ]
+    },
+    {
+      "name": "Saudi Awwal Bank",
+      "ticker": "1060",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "البنك السعودي الأول",
+        "ساب"
+      ]
+    },
+    {
+      "name": "Arab National Bank",
+      "ticker": "1080",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "البنك العربي الوطني"
+      ]
+    },
+    {
+      "name": "Saudi Tadawul Group Holding Co.",
+      "ticker": "1111",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "تداول السعودية",
+        "مجموعة تداول"
+      ]
+    },
+    {
+      "name": "Al Rajhi Bank",
+      "ticker": "1120",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "مصرف الراجحي",
+        "بنك الراجحي"
+      ]
+    },
+    {
+      "name": "Bank Albilad",
+      "ticker": "1140",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "بنك البلاد"
+      ]
+    },
+    {
+      "name": "Alinma Bank",
+      "ticker": "1150",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "مصرف الإنماء",
+        "الانماء"
+      ]
+    },
+    {
+      "name": "The Saudi National Bank",
+      "ticker": "1180",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "البنك الأهلي السعودي",
+        "الاهلي"
+      ]
+    },
+    {
+      "name": "Amlak International Finance Co.",
+      "ticker": "1182",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "SHL Finance Co.",
+      "ticker": "1183",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Takween Advanced Industries Co.",
+      "ticker": "1201",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Middle East Paper Co.",
+      "ticker": "1202",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Basic Chemical Industries Co.",
+      "ticker": "1210",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Arabian Mining Co.",
+      "ticker": "1211",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "معادن"
+      ]
+    },
+    {
+      "name": "Astra Industrial Group",
+      "ticker": "1212",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Naseej International Trading Co.",
+      "ticker": "1213",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al Hassan Ghazi Ibrahim Shaker Co.",
+      "ticker": "1214",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "United Wire Factories Co.",
+      "ticker": "1301",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Bawan Co.",
+      "ticker": "1302",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Electrical Industries Co.",
+      "ticker": "1303",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al Yamamah Steel Industries Co.",
+      "ticker": "1304",
+      "market": "main",
+      "financialYearEnd": "30/09"
+    },
+    {
+      "name": "Saudi Steel Pipe Co.",
+      "ticker": "1320",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "East Pipes Integrated Company for Industry",
+      "ticker": "1321",
+      "market": "main",
+      "financialYearEnd": "31/03"
+    },
+    {
+      "name": "Almasane Alkobra Mining Co.",
+      "ticker": "1322",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "United Carton Industries Co.",
+      "ticker": "1323",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saleh Abdulaziz Al Rashed and Sons Co.",
+      "ticker": "1324",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Seera Group Holding",
+      "ticker": "1810",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "سيرا"
+      ]
+    },
+    {
+      "name": "BAAN Holding Group Co.",
+      "ticker": "1820",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "بان القابضة",
+        "مجموعة الحكير"
+      ]
+    },
+    {
+      "name": "Leejam Sports Co.",
+      "ticker": "1830",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "لجام",
+        "وقت اللياقة"
+      ]
+    },
+    {
+      "name": "Maharah Human Resources Co.",
+      "ticker": "1831",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Sadr Logistics Co.",
+      "ticker": "1832",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al Mawarid Manpower Co.",
+      "ticker": "1833",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Manpower Solutions Co.",
+      "ticker": "1834",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Tamkeen Human Resource Co.",
+      "ticker": "1835",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Methanol Chemicals Co.",
+      "ticker": "2001",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Basic Industries Corp.",
+      "ticker": "2010",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "سابك"
+      ]
+    },
+    {
+      "name": "SABIC Agri-Nutrients Co.",
+      "ticker": "2020",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "سابك للمغذيات الزراعية"
+      ]
+    },
+    {
+      "name": "Saudi Arabia Refineries Co.",
+      "ticker": "2030",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Ceramic Co.",
+      "ticker": "2040",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Savola Group",
+      "ticker": "2050",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "صافولا"
+      ]
+    },
+    {
+      "name": "National Industrialization Co.",
+      "ticker": "2060",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "التصنيع"
+      ]
+    },
+    {
+      "name": "Saudi Pharmaceutical Industries and Medical Appliances Corp.",
+      "ticker": "2070",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "National Gas and Industrialization Company Holding",
+      "ticker": "2080",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Alkhorayef Water and Power Technologies Co.",
+      "ticker": "2081",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "ACWA POWER Co.",
+      "ticker": "2082",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "أكوا باور",
+        "اكوا باور"
+      ]
+    },
+    {
+      "name": "The Power and Water Utility Company for Jubail and Yanbu",
+      "ticker": "2083",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Miahona Co.",
+      "ticker": "2084",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "National Gypsum Co.",
+      "ticker": "2090",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Wafrah for Industry and Development Co.",
+      "ticker": "2100",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Cable Co.",
+      "ticker": "2110",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Advanced Industries Co.",
+      "ticker": "2120",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Industrial Development Co.",
+      "ticker": "2130",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "AYYAN Investment Co.",
+      "ticker": "2140",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "The National Company for Glass Industries",
+      "ticker": "2150",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Arabian Amiantit Co.",
+      "ticker": "2160",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Alujain Corp.",
+      "ticker": "2170",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Filing and Packing Materials Manufacturing Co.",
+      "ticker": "2180",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Sustained Infrastructure Holding Co.",
+      "ticker": "2190",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arabian Pipes Co.",
+      "ticker": "2200",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Nama Chemicals Co.",
+      "ticker": "2210",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "National Metal Manufacturing and Casting Co.",
+      "ticker": "2220",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Arabian Oil Co.",
+      "ticker": "2222",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "أرامكو",
+        "ارامكو"
+      ]
+    },
+    {
+      "name": "Saudi Aramco Base Oil Co.",
+      "ticker": "2223",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "لوبريف"
+      ]
+    },
+    {
+      "name": "Saudi Chemical Co.",
+      "ticker": "2230",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Advanced Building Industries Co.",
+      "ticker": "2240",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Industrial Investment Group",
+      "ticker": "2250",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudia Dairy and Foodstuff Co.",
+      "ticker": "2270",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Almarai Co.",
+      "ticker": "2280",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "المراعي"
+      ]
+    },
+    {
+      "name": "Tanmiah Food Co.",
+      "ticker": "2281",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "تنمية"
+      ]
+    },
+    {
+      "name": "Naqi Water Co.",
+      "ticker": "2282",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "First Milling Co.",
+      "ticker": "2283",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Modern Mills for Food Products Co.",
+      "ticker": "2284",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arabian Mills for Food Products Co.",
+      "ticker": "2285",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Fourth Milling Co.",
+      "ticker": "2286",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arabian Company for Agricultural and Industrial Investment",
+      "ticker": "2287",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Nofoth Food Products Co.",
+      "ticker": "2288",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Yanbu National Petrochemical Co.",
+      "ticker": "2290",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Paper Manufacturing Co.",
+      "ticker": "2300",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Sahara International Petrochemical Co.",
+      "ticker": "2310",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al-Babtain Power and Telecommunication Co.",
+      "ticker": "2320",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Advanced Petrochemical Co.",
+      "ticker": "2330",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "ARTEX Industrial Investment Co.",
+      "ticker": "2340",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Kayan Petrochemical Co.",
+      "ticker": "2350",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Vitrified Clay Pipes Co.",
+      "ticker": "2360",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Middle East Specialized Cables Co.",
+      "ticker": "2370",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Rabigh Refining and Petrochemical Co.",
+      "ticker": "2380",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arabian Drilling Co.",
+      "ticker": "2381",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "الحفر العربية"
+      ]
+    },
+    {
+      "name": "Ades Holding Co.",
+      "ticker": "2382",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "أديس",
+        "اديس"
+      ]
+    },
+    {
+      "name": "Najran Cement Co.",
+      "ticker": "3002",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "أسمنت نجران"
+      ]
+    },
+    {
+      "name": "City Cement Co.",
+      "ticker": "3003",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Northern Region Cement Co.",
+      "ticker": "3004",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Umm Al-Qura Cement Co.",
+      "ticker": "3005",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Zahrat Al Waha for Trading Co.",
+      "ticker": "3007",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al Kathiri Holding Co.",
+      "ticker": "3008",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arabian Cement Co.",
+      "ticker": "3010",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "أسمنت العربية"
+      ]
+    },
+    {
+      "name": "Yamama Cement Co.",
+      "ticker": "3020",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "أسمنت اليمامة"
+      ]
+    },
+    {
+      "name": "Saudi Cement Co.",
+      "ticker": "3030",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "أسمنت السعودية"
+      ]
+    },
+    {
+      "name": "Qassim Cement Co.",
+      "ticker": "3040",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "أسمنت القصيم"
+      ]
+    },
+    {
+      "name": "Southern Province Cement Co.",
+      "ticker": "3050",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "أسمنت الجنوبية"
+      ]
+    },
+    {
+      "name": "Yanbu Cement Co.",
+      "ticker": "3060",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "أسمنت ينبع"
+      ]
+    },
+    {
+      "name": "Eastern Province Cement Co.",
+      "ticker": "3080",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Tabuk Cement Co.",
+      "ticker": "3090",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "أسمنت تبوك"
+      ]
+    },
+    {
+      "name": "Al Jouf Cement Co.",
+      "ticker": "3091",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Riyadh Cement Co.",
+      "ticker": "3092",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Abdullah Al Othaim Markets Co.",
+      "ticker": "4001",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "أسواق العثيم"
+      ]
+    },
+    {
+      "name": "Mouwasat Medical Services Co.",
+      "ticker": "4002",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "المواساة"
+      ]
+    },
+    {
+      "name": "United Electronics Co.",
+      "ticker": "4003",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "إكسترا",
+        "اكسترا"
+      ]
+    },
+    {
+      "name": "Dallah Healthcare Co.",
+      "ticker": "4004",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "دلة الصحية"
+      ]
+    },
+    {
+      "name": "National Medical Care Co.",
+      "ticker": "4005",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "رعاية"
+      ]
+    },
+    {
+      "name": "Saudi Marketing Co.",
+      "ticker": "4006",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al Hammadi Holding",
+      "ticker": "4007",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "الحمادي"
+      ]
+    },
+    {
+      "name": "Saudi Company for Hardware",
+      "ticker": "4008",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Middle East Healthcare Co.",
+      "ticker": "4009",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "السعودي الألماني الصحية"
+      ]
+    },
+    {
+      "name": "Lazurde Company for Jewelry",
+      "ticker": "4011",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Thob Al Aseel Co.",
+      "ticker": "4012",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Dr. Sulaiman Al Habib Medical Services Group",
+      "ticker": "4013",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "سليمان الحبيب",
+        "الحبيب"
+      ]
+    },
+    {
+      "name": "Scientific and Medical Equipment House Co.",
+      "ticker": "4014",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "دار المعدات"
+      ]
+    },
+    {
+      "name": "Jamjoom Pharmaceuticals Factory Co.",
+      "ticker": "4015",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "جمجوم فارما"
+      ]
+    },
+    {
+      "name": "Middle East Pharmaceutical Industries Co.",
+      "ticker": "4016",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Dr. Soliman Abdel Kader Fakeeh Hospital Co.",
+      "ticker": "4017",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "فقيه"
+      ]
+    },
+    {
+      "name": "Almoosa Health Co.",
+      "ticker": "4018",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "الموسى"
+      ]
+    },
+    {
+      "name": "Specialized Medical Co.",
+      "ticker": "4019",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Real Estate Co.",
+      "ticker": "4020",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "العقارية"
+      ]
+    },
+    {
+      "name": "Canadian Medical Center Co.",
+      "ticker": "4021",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "National Shipping Company of Saudi Arabia",
+      "ticker": "4030",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "البحري"
+      ]
+    },
+    {
+      "name": "Saudi Ground Services Co.",
+      "ticker": "4031",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "الخدمات الأرضية"
+      ]
+    },
+    {
+      "name": "Saudi Public Transport Co.",
+      "ticker": "4040",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "سابتكو"
+      ]
+    },
+    {
+      "name": "Saudi Automotive Services Co.",
+      "ticker": "4050",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "ساسكو"
+      ]
+    },
+    {
+      "name": "Baazeem Trading Co.",
+      "ticker": "4051",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Anaam International Holding Group",
+      "ticker": "4061",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Tihama Advertising, Public Relations and Marketing Co.",
+      "ticker": "4070",
+      "market": "main",
+      "financialYearEnd": "31/03"
+    },
+    {
+      "name": "Arabian Contracting Services Co.",
+      "ticker": "4071",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "MBC Group Co.",
+      "ticker": "4072",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "ام بي سي"
+      ]
+    },
+    {
+      "name": "Sinad Holding Co.",
+      "ticker": "4080",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Nayifat Finance Co.",
+      "ticker": "4081",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Morabaha Marina Financing Co.",
+      "ticker": "4082",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "United International Holding Co.",
+      "ticker": "4083",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Derayah Financial Co.",
+      "ticker": "4084",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "دراية"
+      ]
+    },
+    {
+      "name": "Taiba Investments Co.",
+      "ticker": "4090",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "طيبة"
+      ]
+    },
+    {
+      "name": "Makkah Construction and Development Co.",
+      "ticker": "4100",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "مكة"
+      ]
+    },
+    {
+      "name": "Batic Investments and Logistics Co.",
+      "ticker": "4110",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Darb Investment Co.",
+      "ticker": "4130",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Industrial Export Co.",
+      "ticker": "4140",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al-Omran Industrial Trading Co.",
+      "ticker": "4141",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Riyadh Cables Group Co.",
+      "ticker": "4142",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al Taiseer Group Talco Industrial Co.",
+      "ticker": "4143",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Raoom Trading Co.",
+      "ticker": "4144",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Obeikan Glass Co.",
+      "ticker": "4145",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Gas Arabian Services Co.",
+      "ticker": "4146",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Consolidated Grunenfelder Saady Holding Co.",
+      "ticker": "4147",
+      "market": "main",
+      "financialYearEnd": "31/03"
+    },
+    {
+      "name": "Alwasail Industrial Co.",
+      "ticker": "4148",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arriyadh Development Co.",
+      "ticker": "4150",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "التعمير"
+      ]
+    },
+    {
+      "name": "Thimar Development Holding Co.",
+      "ticker": "4160",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "ثمار"
+      ]
+    },
+    {
+      "name": "BinDawood Holding Co.",
+      "ticker": "4161",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "بن داود"
+      ]
+    },
+    {
+      "name": "Almunajem Foods Co.",
+      "ticker": "4162",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "المنجم"
+      ]
+    },
+    {
+      "name": "Aldawaa Medical Services Co.",
+      "ticker": "4163",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "الدواء"
+      ]
+    },
+    {
+      "name": "Nahdi Medical Co.",
+      "ticker": "4164",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "النهدي"
+      ]
+    },
+    {
+      "name": "Al Majed Oud Co.",
+      "ticker": "4165",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Tourism Enterprise Co.",
+      "ticker": "4170",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Fitaihi Holding Group",
+      "ticker": "4180",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Jarir Marketing Co.",
+      "ticker": "4190",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "جرير"
+      ]
+    },
+    {
+      "name": "Abdullah Saad Mohammed Abo Moati for Bookstores Co.",
+      "ticker": "4191",
+      "market": "main",
+      "financialYearEnd": "31/03"
+    },
+    {
+      "name": "AlSaif Stores for Development and Investment Co.",
+      "ticker": "4192",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Nice One Beauty Digital Marketing Co.",
+      "ticker": "4193",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Marketing Home Group for Trading Co.",
+      "ticker": "4194",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Aldrees Petroleum and Transport Services Co.",
+      "ticker": "4200",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "الدريس"
+      ]
+    },
+    {
+      "name": "Saudi Research and Media Group",
+      "ticker": "4210",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "الأبحاث والإعلام"
+      ]
+    },
+    {
+      "name": "Emaar The Economic City",
+      "ticker": "4220",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "إعمار"
+      ]
+    },
+    {
+      "name": "Red Sea International Co.",
+      "ticker": "4230",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "البحر الأحمر"
+      ]
+    },
+    {
+      "name": "AFG International Co.",
+      "ticker": "4240",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "سينومي ريتيل",
+        "الحكير للتجزئة"
+      ]
+    },
+    {
+      "name": "Jabal Omar Development Co.",
+      "ticker": "4250",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "جبل عمر"
+      ]
+    },
+    {
+      "name": "United International Transportation Co.",
+      "ticker": "4260",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "بدجت"
+      ]
+    },
+    {
+      "name": "Theeb Rent a Car Co.",
+      "ticker": "4261",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "ذيب"
+      ]
+    },
+    {
+      "name": "Lumi Rental Co.",
+      "ticker": "4262",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "لومي"
+      ]
+    },
+    {
+      "name": "SAL Saudi Logistics Services Co.",
+      "ticker": "4263",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "سال"
+      ]
+    },
+    {
+      "name": "Flynas Co.",
+      "ticker": "4264",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Cherry Trading Co.",
+      "ticker": "4265",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Printing and Packaging Co.",
+      "ticker": "4270",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Kingdom Holding Co.",
+      "ticker": "4280",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Alkhaleej Training and Education Co.",
+      "ticker": "4290",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "National Company for Learning and Education",
+      "ticker": "4291",
+      "market": "main",
+      "financialYearEnd": "31/07",
+      "searchAliases": [
+        "الوطنية للتعليم"
+      ]
+    },
+    {
+      "name": "Ataa Educational Co.",
+      "ticker": "4292",
+      "market": "main",
+      "financialYearEnd": "31/07",
+      "searchAliases": [
+        "عطاء"
+      ]
+    },
+    {
+      "name": "Dar Alarkan Real Estate Development Co.",
+      "ticker": "4300",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "دار الأركان"
+      ]
+    },
+    {
+      "name": "Knowledge Economic City",
+      "ticker": "4310",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Alandalus Property Co.",
+      "ticker": "4320",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "الأندلس"
+      ]
+    },
+    {
+      "name": "Arabian Centres Co.",
+      "ticker": "4321",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "سينومي سنترز"
+      ]
+    },
+    {
+      "name": "Retal Urban Development Co.",
+      "ticker": "4322",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "رتال"
+      ]
+    },
+    {
+      "name": "Sumou Real Estate Co.",
+      "ticker": "4323",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Banan Real Estate Co.",
+      "ticker": "4324",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Umm Al Qura for Development and Construction Co.",
+      "ticker": "4325",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Dar Al Majed Real Estate Co.",
+      "ticker": "4326",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Alramz Real Estate Co.",
+      "ticker": "4327",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Ladun Investment Co.",
+      "ticker": "4328",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Energy Co.",
+      "ticker": "5110",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Halwani Bros. Co.",
+      "ticker": "6001",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "حلواني"
+      ]
+    },
+    {
+      "name": "Herfy Food Services Co.",
+      "ticker": "6002",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "هرفي"
+      ]
+    },
+    {
+      "name": "CATRION Catering Holding Co.",
+      "ticker": "6004",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "التموين"
+      ]
+    },
+    {
+      "name": "National Agricultural Development Co.",
+      "ticker": "6010",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "نادك"
+      ]
+    },
+    {
+      "name": "Raydan Food Co.",
+      "ticker": "6012",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Development Works Food Co.",
+      "ticker": "6013",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Alamar Foods Co.",
+      "ticker": "6014",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Americana Restaurants International PLC - Foreign Company",
+      "ticker": "6015",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "أمريكانا"
+      ]
+    },
+    {
+      "name": "Shatirah House Restaurant Co.",
+      "ticker": "6016",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Jahez International Company for Information System Technology",
+      "ticker": "6017",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Sport Clubs Co.",
+      "ticker": "6018",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al Masar Al Shamil Education Co.",
+      "ticker": "6019",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al Gassim Investment Holding Co.",
+      "ticker": "6020",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Armah Sports Co.",
+      "ticker": "6022",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Tabuk Agricultural Development Co.",
+      "ticker": "6040",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Fisheries Co.",
+      "ticker": "6050",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Ash-Sharqiyah Development Co.",
+      "ticker": "6060",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al-Jouf Agricultural Development Co.",
+      "ticker": "6070",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Jazan Development and Investment Co.",
+      "ticker": "6090",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Telecom Co.",
+      "ticker": "7010",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "الاتصالات السعودية",
+        "اس تي سي"
+      ]
+    },
+    {
+      "name": "Etihad Etisalat Co.",
+      "ticker": "7020",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "موبايلي",
+        "اتحاد اتصالات"
+      ]
+    },
+    {
+      "name": "Mobile Telecommunication Company Saudi Arabia",
+      "ticker": "7030",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "زين السعودية"
+      ]
+    },
+    {
+      "name": "Etihad GO Telecom Co.",
+      "ticker": "7040",
+      "market": "main",
+      "financialYearEnd": "31/03",
+      "searchAliases": [
+        "عذيب",
+        "جو"
+      ]
+    },
+    {
+      "name": "Al Moammar Information Systems Co.",
+      "ticker": "7200",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arab Sea Information System Co.",
+      "ticker": "7201",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arabian Internet and Communications Services Co.",
+      "ticker": "7202",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "سلوشنز"
+      ]
+    },
+    {
+      "name": "Elm Co.",
+      "ticker": "7203",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "علم"
+      ]
+    },
+    {
+      "name": "Perfect Presentation for Commercial Services Co.",
+      "ticker": "7204",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Dar Albalad for Business Solutions Co.",
+      "ticker": "7205",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Azm for Communication and Information Technology Co.",
+      "ticker": "7211",
+      "market": "main",
+      "financialYearEnd": "30/06"
+    },
+    {
+      "name": "The Company for Cooperative Insurance",
+      "ticker": "8010",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "التعاونية"
+      ]
+    },
+    {
+      "name": "Aljazira Takaful Taawuni Co.",
+      "ticker": "8012",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Malath Cooperative Insurance Co.",
+      "ticker": "8020",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "The Mediterranean and Gulf Insurance and Reinsurance Co.",
+      "ticker": "8030",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Mutakamela Insurance Co.",
+      "ticker": "8040",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Salama Cooperative Insurance Co.",
+      "ticker": "8050",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Walaa Cooperative Insurance Co.",
+      "ticker": "8060",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arabian Shield Cooperative Insurance Co.",
+      "ticker": "8070",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Arabian Cooperative Insurance Co.",
+      "ticker": "8100",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Gulf Union Alahlia Cooperative Insurance Co.",
+      "ticker": "8120",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Allied Cooperative Insurance Group",
+      "ticker": "8150",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arabia Insurance Cooperative Co.",
+      "ticker": "8160",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al-Etihad Cooperative Insurance Co.",
+      "ticker": "8170",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al Sagr Cooperative Insurance Co.",
+      "ticker": "8180",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "United Cooperative Assurance Co.",
+      "ticker": "8190",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Reinsurance Co.",
+      "ticker": "8200",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Bupa Arabia for Cooperative Insurance Co.",
+      "ticker": "8210",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "بوبا العربية"
+      ]
+    },
+    {
+      "name": "Al-Rajhi Company for Cooperative Insurance",
+      "ticker": "8230",
+      "market": "main",
+      "financialYearEnd": "31/12",
+      "searchAliases": [
+        "تكافل الراجحي"
+      ]
+    },
+    {
+      "name": "CHUBB Arabia Cooperative Insurance Co.",
+      "ticker": "8240",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Gulf Insurance Group",
+      "ticker": "8250",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Gulf General Cooperative Insurance Co.",
+      "ticker": "8260",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "LIVA Insurance Co.",
+      "ticker": "8280",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Wataniya Insurance Co.",
+      "ticker": "8300",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Amana Cooperative Insurance Co.",
+      "ticker": "8310",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Enaya Cooperative Insurance Co.",
+      "ticker": "8311",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Rasan Information Technology Co.",
+      "ticker": "8313",
+      "market": "main",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "National Building and Marketing Co.",
+      "ticker": "9510",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Watani Iron Steel Co.",
+      "ticker": "9513",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Mohammed Hasan AlNaqool Sons Co.",
+      "ticker": "9514",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Fesh Fash Snack Food Production Co.",
+      "ticker": "9515",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Natural Gas Distribution Co.",
+      "ticker": "9516",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "MOBI Industry Co.",
+      "ticker": "9517",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Inmar Company for Real Estate Development and Investment",
+      "ticker": "9521",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Alhasoob Co.",
+      "ticker": "9522",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Group Five Pipe Saudi Co.",
+      "ticker": "9523",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Advance International Company for Communication and Information Technology",
+      "ticker": "9524",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "AME Company for Medical Supplies",
+      "ticker": "9527",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arabian International Healthcare Holding Co.",
+      "ticker": "9530",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Aljouf Mineral Water Bottling Co.",
+      "ticker": "9532",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Parts Center Co.",
+      "ticker": "9533",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arabian Food and Dairy Factories Co.",
+      "ticker": "9536",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Amwaj International Co.",
+      "ticker": "9537",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Naseej for Technology Co.",
+      "ticker": "9538",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Aqaseem Factory for Chemicals and Plastics Co.",
+      "ticker": "9539",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "National Environmental Recycling Co.",
+      "ticker": "9540",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Academy of Learning Co.",
+      "ticker": "9541",
+      "market": "nomu",
+      "financialYearEnd": "30/06"
+    },
+    {
+      "name": "Keir International Co.",
+      "ticker": "9542",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Networkers Services Co.",
+      "ticker": "9543",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Future Care Trading Co.",
+      "ticker": "9544",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "International Human Resources Co.",
+      "ticker": "9545",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Naba Alsaha Medical Services Co.",
+      "ticker": "9546",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Rawasi Albina Investment Co.",
+      "ticker": "9547",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arabian Plastic Industrial Co.",
+      "ticker": "9548",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Abdulaziz and Mansour Ibrahim Albabtin Co.",
+      "ticker": "9549",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Sure Global Tech Co.",
+      "ticker": "9550",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Knowledge Tower Trading Co.",
+      "ticker": "9551",
+      "market": "nomu",
+      "financialYearEnd": "31/03"
+    },
+    {
+      "name": "Saudi Top for Trading Co.",
+      "ticker": "9552",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Molan Steel Co.",
+      "ticker": "9553",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Leen Alkhair Trading Co.",
+      "ticker": "9555",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Edarat Communication and Information Technology Co.",
+      "ticker": "9557",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Alqemam for Computer Systems Co.",
+      "ticker": "9558",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Balady Poultry Co.",
+      "ticker": "9559",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Waja Co.",
+      "ticker": "9560",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Knowledge Net Co.",
+      "ticker": "9561",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Foods Gate Trading Co.",
+      "ticker": "9562",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Bena Steel Industries Co.",
+      "ticker": "9563",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Horizon Food Co.",
+      "ticker": "9564",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Meyar Co.",
+      "ticker": "9565",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Saudi Lime Industries Co.",
+      "ticker": "9566",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Ghida Alsultan for Fast Food Co.",
+      "ticker": "9567",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Mayar Holding Co.",
+      "ticker": "9568",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Almuneef Company for Trade, Industry, Agriculture and Contracting",
+      "ticker": "9569",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Tam Development Co.",
+      "ticker": "9570",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Munawla Cargo Co.",
+      "ticker": "9571",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al-Razi Medical Co.",
+      "ticker": "9572",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Professional Medical Expertise Co.",
+      "ticker": "9574",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Marble Design Co.",
+      "ticker": "9575",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Paper Home Co.",
+      "ticker": "9576",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Dar Almarkabah for Renting Cars Co.",
+      "ticker": "9577",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Atlas Elevators General Trading and Contracting Co.",
+      "ticker": "9578",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Intelligent Oud Company for Trading",
+      "ticker": "9579",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al Rashid Industrial Co.",
+      "ticker": "9580",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Clean Life Co.",
+      "ticker": "9581",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "United Mining Industries Co.",
+      "ticker": "9583",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Riyal Investment and Development Co.",
+      "ticker": "9584",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Mulkia Investment Co.",
+      "ticker": "9585",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Osool and Bakheet Investment Co.",
+      "ticker": "9586",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Lana Medical Co.",
+      "ticker": "9587",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Riyadh Steel Co.",
+      "ticker": "9588",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Fad International Co.",
+      "ticker": "9589",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "View United Real Estate Development Co.",
+      "ticker": "9591",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Almujtama Alraida Medical Co.",
+      "ticker": "9592",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Pan Gulf Marketing Co.",
+      "ticker": "9593",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al-Modawat Specialized Medical Co.",
+      "ticker": "9594",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "WSM for Information Technology Co.",
+      "ticker": "9595",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Quara Finance Co.",
+      "ticker": "9596",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Leaf Global Environmental Services Co.",
+      "ticker": "9597",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al Mohafaza Company for Education",
+      "ticker": "9598",
+      "market": "nomu",
+      "financialYearEnd": "31/07"
+    },
+    {
+      "name": "Taqat Mineral Trading Co.",
+      "ticker": "9599",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Qomel Co.",
+      "ticker": "9600",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Mohammed Hadi Al Rasheed and Partners Co.",
+      "ticker": "9601",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Yaqeen Capital Co.",
+      "ticker": "9602",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Horizon Educational Co.",
+      "ticker": "9603",
+      "market": "nomu",
+      "financialYearEnd": "30/06"
+    },
+    {
+      "name": "Miral Dental Clinics Co.",
+      "ticker": "9604",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Neft Alsharq Company for Chemical Industries",
+      "ticker": "9605",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Altharwah Albashariyyah Co.",
+      "ticker": "9606",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "ASG Plastic Factory Co.",
+      "ticker": "9607",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al Ashghal Al Moysra Co.",
+      "ticker": "9608",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Naas Petrol Factory Co.",
+      "ticker": "9609",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "First Avenue for Real Estate Development Co.",
+      "ticker": "9610",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arabian United Float Glass Co.",
+      "ticker": "9611",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Sama Healthy Water Factory Co.",
+      "ticker": "9612",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Shalfa Facilities Management Co.",
+      "ticker": "9613",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Purity for Information Technology Co.",
+      "ticker": "9614",
+      "market": "nomu",
+      "financialYearEnd": "30/06"
+    },
+    {
+      "name": "Mufeed Co.",
+      "ticker": "9615",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Jana Medical Co.",
+      "ticker": "9616",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Arabica Star Co.",
+      "ticker": "9617",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Alfakhera for Mens Tailoring Co.",
+      "ticker": "9618",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Multi Business Group Co.",
+      "ticker": "9619",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Balsm Alofoq Medical Co.",
+      "ticker": "9620",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Digital Research Co.",
+      "ticker": "9621",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Shmoh Almadi Co.",
+      "ticker": "9622",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Albattal Factory for Chemical Industries Co.",
+      "ticker": "9623",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Alshehili Company for Metal Industries",
+      "ticker": "9624",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Itmam Consultancy Co.",
+      "ticker": "9625",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Basma Adeem Medical Co.",
+      "ticker": "9626",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Twareat Medical Care Co.",
+      "ticker": "9627",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Lamasat Co.",
+      "ticker": "9628",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Ratio Speciality Company for Trading",
+      "ticker": "9630",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Hedab Alkhaleej Trading Co.",
+      "ticker": "9631",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Future Vision for Health Training Co.",
+      "ticker": "9632",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Service Equipment Co.",
+      "ticker": "9633",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Adeer Real Estate Co.",
+      "ticker": "9634",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Dkhoun National Trading Co.",
+      "ticker": "9635",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Al Kuzama Trading Co.",
+      "ticker": "9636",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Axelerated Solutions for Information and Communication Technology Co.",
+      "ticker": "9637",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Anmat Technology for Trading Co.",
+      "ticker": "9639",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Asas Makeen Real Estate Development and Investment Co.",
+      "ticker": "9640",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Hawyia Auctions Co.",
+      "ticker": "9641",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Time Entertainment Co.",
+      "ticker": "9642",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Naf Company for Feed for Industry",
+      "ticker": "9644",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "National Signage Industrial Co.",
+      "ticker": "9645",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Wajd Life Trading Co.",
+      "ticker": "9647",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Hamad Mohammed Bin Saedan Real Estate Co.",
+      "ticker": "9648",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Jamjoom Fashion Trading Co.",
+      "ticker": "9649",
+      "market": "nomu",
+      "financialYearEnd": "30/09"
+    },
+    {
+      "name": "Sahat Almajd Trading Co.",
+      "ticker": "9650",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Abdulaziz Bin Ahmed Altwijri Trading Co.",
+      "ticker": "9651",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "Khaled Dhafer and Brothers for Logistics Services Co.",
+      "ticker": "9653",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    },
+    {
+      "name": "MSGA Investment Co.",
+      "ticker": "9655",
+      "market": "nomu",
+      "financialYearEnd": "31/12"
+    }
+  ],
+  "searchAliasNote": "الأسماء الإنجليزية هي أسماء المرجع الرسمي؛ المرادفات العربية المختارة محلية للبحث وليست بديلًا عن الاسم القانوني أو تاريخًا لتغيير الاسم."
+}

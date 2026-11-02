@@ -1,0 +1,31 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+const read = async name => JSON.parse(await readFile(new URL(`../data/${name}.json`, import.meta.url), 'utf8'));
+
+test('listed directory preserves unique sourced identities without pretending to contain market prices', async () => {
+  const directory = await read('listed-directory');
+  assert.equal(directory.completeness, 'source_snapshot_not_live_directory');
+  assert.equal(directory.companies.length, 376);
+  assert.equal(new Set(directory.companies.map(c => c.ticker)).size, 376);
+  assert.equal(directory.companies.filter(c => c.market === 'main').length, 253);
+  assert.equal(directory.companies.filter(c => c.market === 'nomu').length, 123);
+  for (const company of directory.companies) {
+    assert.match(company.ticker, /^\d{4}$/); assert.ok(company.name.trim());
+    assert.equal(company.price, undefined); assert.equal(company.revenue, undefined);
+  }
+  assert.ok(directory.companies.find(c => c.ticker === '1120').searchAliases.includes('مصرف الراجحي'));
+});
+test('strategic studies retain references and do not enter the quarterly listed-company engine', async () => {
+  for (const id of ['kafd', 'humain']) {
+    const profile = await read(`${id}-profile`);
+    assert.equal(profile.id, id); assert.equal(profile.ticker, null);
+    assert.equal(profile.quarters, undefined); assert.equal(profile.netProfit, undefined);
+    assert.ok(profile.limitations.length > 0);
+    const sources = new Set(profile.sources.map(source => source.id));
+    for (const finding of profile.findings) {
+      assert.ok(finding.sourceIds.length > 0);
+      finding.sourceIds.forEach(sourceId => assert.ok(sources.has(sourceId)));
+    }
+  }
+});
