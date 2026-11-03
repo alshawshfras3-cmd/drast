@@ -1,5 +1,4 @@
-import {getResearchIssuer, libraryEvidence} from '@/lib/research-issuers.mjs';
-import {getPilotCompany} from '@/lib/pilot-catalog.mjs';
+import {getResearchConnector, getResearchIssuer, libraryEvidence} from '@/lib/research-issuers.mjs';
 import { actor, listDocuments, readDocument, response, saveDocument } from '@/lib/repository';
 import { researchAccess, researchBody } from '@/lib/research-http';
 import { collectCompanySources } from '@/lib/source-collector.mjs';
@@ -14,7 +13,8 @@ export async function POST(request: Request) {
     if (typeof companyId !== 'string') return response({ error: 'اختر شركة من الفهرس.' }, 400);
     const owner = actor(request);
     if (!owner) return response({error:'هذه مساحة عمل خاصة.'}, 401);
-    if (!getPilotCompany(companyId)) {
+    const connector = getResearchConnector(companyId);
+    if (!connector) {
       const issuer = getResearchIssuer(companyId);
       if (!issuer) return response({error:'الشركة غير موجودة في الفهرس.'},400);
       if (!storageReady()) return response({error:'مكتبة الإفصاحات غير مهيّأة في هذه البيئة. يلزم ربط تخزين «دراسات» قبل البحث في مستندات الشركة.'},503);
@@ -29,8 +29,8 @@ export async function POST(request: Request) {
       return response({evidence,issues:[summary],summary});
     }
     const approved = new Set((process.env.DRAST_ARCHIVE_APPROVED_ISSUERS ?? '').split(',').map(id=>id.trim()).filter(Boolean));
-    const result = await collectCompanySources(companyId, {
-      ...(storageReady() && approved.has(companyId) ? {
+    const result = await collectCompanySources(connector.id, {
+      ...(storageReady() && approved.has(connector.id) ? {
         importPdf: async (company: {id:string;ticker:string;name:string}, source: {url:string;kind:string;totalPages:number;text:string}, bytes: Uint8Array, deadline: number) => {
           const record = collectedPdfRecord(company, source, bytes, approved);
           if (!record) return false;
@@ -44,7 +44,8 @@ export async function POST(request: Request) {
       } : {}),
     });
     return response({
-      ...result,
+      ...result, companyId,
+      evidence:result.evidence.map(item=>({...item,companyId})),
       ...(!result.evidence.length ? {summary:'لم ينجح الجلب في توفير نص قابل للدراسة. راجع تفاصيل المصادر لمعرفة السبب.'} : {}),
     });
   } catch (error) {

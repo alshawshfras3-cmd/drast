@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Database, ArrowLeft, ArrowUpLeft, BookOpen, CalendarDays, Check, CheckCircle2, ChevronDown, ChevronLeft, Clock3, Download, ExternalLink, FilePenLine, FileText, FolderArchive, HardDrive, History, Inbox, Layers3, ListTodo, LoaderCircle, Pause, Play, Plus, Printer, RefreshCw, Save, Search, ShieldCheck, Sparkles, TriangleAlert, Upload, X } from 'lucide-react';
-import { libraryEvidenceId } from '@/lib/research-issuers.mjs';
+import { getResearchConnector, getResearchIssuer, libraryEvidenceId, researchIssuerIds } from '@/lib/research-issuers.mjs';
 import { isSafeSourceUrl } from '@/lib/study-engine.mjs';
 import { parseResearchBackup, readResearchJobs, removeResearchJob, saveResearchJob, saveResearchJobs, readCloudSyncStamps, saveCloudSyncStamp, checkCloudJobs, listCloudJobs, fetchCloudJob, uploadCloudJob, type CloudJobsStatus, type CloudJobSummary, type CloudSyncStamp, type Evidence, type ResearchJob, type ResearchReport, type ResearchType, type TaskStatus } from './pilot-browser-store';
 
@@ -92,7 +92,7 @@ export default function ResearchDesk({ companies, renderFinancialCharts, onOpenL
   const selected = jobs.find(job => job.id === selectedId);
   const strategicSelected = selectedCompanies.some(id => isStrategicCompany(companies.find(company => company.id === id)));
   const dirty = !!selected?.report && editor !== (selected.editedText ?? reportText(selected));
-  const companyName = (id: string) => companies.find(company => company.id === id)?.name || id;
+  const companyName = (id: string) => companies.find(company => company.id === id)?.name || getResearchIssuer(id)?.name || id;
   const pending = jobs.filter(job => ['queued', 'paused'].includes(job.status));
   const reportJobs = jobs.filter(job => job.report);
   const completedToday = jobs.filter(job => job.day === today() && job.status === 'ready').length;
@@ -269,7 +269,7 @@ export default function ResearchDesk({ companies, renderFinancialCharts, onOpenL
     try {
       if (runningRef.current) throw new Error('أوقف التنفيذ قبل استيراد نسخة احتياطية.');
       if (file.size > 15 * 1024 * 1024) throw new Error('الحد الأقصى للنسخة الاحتياطية 15 ميجابايت.');
-      const restored = parseResearchBackup(JSON.parse(await file.text()), companies.map(company => company.id));
+      const restored = parseResearchBackup(JSON.parse(await file.text()), researchIssuerIds);
       const existing = new Set(jobsRef.current.map(job => job.id));
       const added = restored.filter(job => !existing.has(job.id));
       await saveResearchJobs(added);
@@ -384,7 +384,7 @@ export default function ResearchDesk({ companies, renderFinancialCharts, onOpenL
             <div className="rd-process"><div className={selected.collectedCompanyIds.length ? 'done' : ['collecting'].includes(selected.status) ? 'current' : ''}><span>{selected.collectedCompanyIds.length ? <Check size={13}/> : '١'}</span><strong>جمع الأدلة</strong><small>{nf.format(selected.evidence.length)} مصدر</small></div><span className="rd-process-line"/><div className={selected.report ? 'done' : selected.status === 'drafting' ? 'current' : ''}><span>{selected.report ? <Check size={13}/> : '٢'}</span><strong>{selected.mode === 'sources_only' ? 'حصر المصادر' : 'صياغة المسودة'}</strong><small>{selected.mode === 'ai' ? 'نموذج AI' : selected.mode === 'sources_only' ? 'دون نموذج AI' : 'بعد اكتمال الجمع'}</small></div><span className="rd-process-line"/><div className={selected.editedAt ? 'done' : ''}><span>{selected.editedAt ? <Check size={13}/> : '٣'}</span><strong>مراجعتك</strong><small>{selected.editedAt ? 'حُفظت التعديلات' : 'لم تُسجل تعديلات'}</small></div></div>
             {selected.stage && <div className={`rd-stage ${selected.status === 'failed' || selected.status === 'blocked' ? 'has-error' : ''}`}>{['collecting', 'drafting'].includes(selected.status) ? <LoaderCircle size={17} className="spin"/> : selected.status === 'ready' || selected.status === 'sources_only' ? <CheckCircle2 size={17}/> : <Clock3 size={17}/>}<span>{selected.stage}</span></div>}
             {selected.error && <div className="rd-alert error" role="alert"><TriangleAlert size={18}/><p>{selected.error}</p></div>}
-            {selected.status==='blocked'&&selected.companyIds.some(id=>id.startsWith('listed-'))&&<button className="btn secondary" onClick={onOpenLibrary}>فتح مكتبة المصادر</button>}
+            {selected.status==='blocked'&&selected.companyIds.some(id=>!getResearchConnector(id))&&<button className="btn secondary" onClick={onOpenLibrary}>فتح مكتبة المصادر</button>}
             {!selected.report && !['collecting', 'drafting', 'no_change'].includes(selected.status) && <button className="btn primary rd-wide" onClick={() => runQueue(selected.id)} disabled={!!runningId || !!storageError}><Play size={16}/>{selected.status === 'queued' ? 'بدء هذه المهمة' : 'استئناف وجمع أحدث المصادر'}</button>}
             {selected.status === 'no_change' && <div className="rd-no-change"><p>لم تتغير الأدلة والسؤال عن المسودة السابقة. يمكنك مراجعتها أو طلب نسخة جديدة صراحةً.</p><div><button className="btn secondary compact" onClick={() => selectJob(selected.duplicateOf || '')}>فتح المسودة السابقة</button><button className="btn secondary compact" onClick={() => newVersion(selected)}>طلب نسخة جديدة</button></div></div>}
             {selected.report && <>

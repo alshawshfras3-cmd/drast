@@ -20,7 +20,7 @@ function pdfFixture() {
 }
 
 test('only the configured watchlist entities and exact approved HTTPS hosts are accepted', () => {
-  assert.deepEqual(PILOT_COMPANIES.map(item => item.id), ['hmg', 'aramco', 'sabic', 'stc', 'almarai', 'baan', 'alrajhi', 'kafd', 'humain']);
+  assert.deepEqual(PILOT_COMPANIES.map(item => item.id), ['hmg', 'aramco', 'sabic', 'stc', 'almarai', 'baan', 'alrajhi', 'snb', 'kafd', 'humain']);
   const company = getPilotCompany('hmg');
   for (const url of ['http://hmg.com/report.pdf', 'https://hmg.com.evil.test/report.pdf', 'https://hmg.com@127.0.0.1/a', 'https://user:pass@hmg.com/a', 'https://hmg.com:8443/a', 'file:///etc/passwd', 'https://127.0.0.1/a']) {
     assert.throws(() => validateSourceUrl(url, company));
@@ -173,4 +173,17 @@ test('Al Rajhi research reads its public earnings release and rejects off-domain
   }});
   assert.ok(result.evidence.some(item=>item.url===release && item.kind==='pdf'));
   assert.ok(result.evidence.every(item=>isAllowedCompanySourceUrl(bank.id,item.url)));
+});
+
+test('the official SNB statement is collected and recognized for existing ticker-based jobs', async () => {
+  const {getResearchConnector,allowedResearchEvidenceUrl}=await import('../lib/research-issuers.mjs');
+  const bank=getResearchConnector('listed-1180');
+  assert.equal(bank.id,'snb');
+  const statement=bank.sourceUrls[0];
+  const result=await collectCompanySources(bank.id,{
+    fetchImpl:async url=>url===statement ? new Response(pdfFixture()) : htmlResponse(reportHtml),
+  });
+  assert.ok(result.evidence.some(item=>item.url===statement&&item.kind==='pdf'));
+  assert.ok(allowedResearchEvidenceUrl('listed-1180',statement));
+  assert.equal(allowedResearchEvidenceUrl('listed-1120',statement),false);
 });
