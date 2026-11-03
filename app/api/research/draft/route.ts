@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     const owner=actor(request);
     if (!owner) return response({error:'هذه مساحة عمل خاصة.'},401);
     const submitted=validateEvidence(raw.evidence, normalized.companyIds);
-    const evidence=await Promise.all(submitted.map(async item=>{
+    const evidence=await Promise.all(submitted.map(async (item: {url:string;companyId:string})=>{
       const id=libraryEvidenceId(item.url);
       return id ? libraryEvidence(getResearchIssuer(item.companyId),await readDocument(owner,id)) : item;
     }));
