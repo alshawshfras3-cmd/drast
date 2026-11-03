@@ -19,8 +19,8 @@ function pdfFixture() {
   return parts.join('');
 }
 
-test('only the eight watchlist entities and exact approved HTTPS hosts are accepted', () => {
-  assert.deepEqual(PILOT_COMPANIES.map(item => item.id), ['hmg', 'aramco', 'sabic', 'stc', 'almarai', 'baan', 'kafd', 'humain']);
+test('only the configured watchlist entities and exact approved HTTPS hosts are accepted', () => {
+  assert.deepEqual(PILOT_COMPANIES.map(item => item.id), ['hmg', 'aramco', 'sabic', 'stc', 'almarai', 'baan', 'alrajhi', 'kafd', 'humain']);
   const company = getPilotCompany('hmg');
   for (const url of ['http://hmg.com/report.pdf', 'https://hmg.com.evil.test/report.pdf', 'https://hmg.com@127.0.0.1/a', 'https://user:pass@hmg.com/a', 'https://hmg.com:8443/a', 'file:///etc/passwd', 'https://127.0.0.1/a']) {
     assert.throws(() => validateSourceUrl(url, company));
@@ -161,4 +161,16 @@ test('archive failure keeps source evidence available for drafting', async () =>
   });
   assert.ok(result.evidence.length > 0);
   assert.ok(result.issues.some(issue => issue.includes('تعذّر استيراد')));
+});
+
+test('Al Rajhi research reads its public earnings release and rejects off-domain documents', async () => {
+  const bank = getPilotCompany('alrajhi');
+  const release = bank.sourceUrls[0];
+  assert.equal(bank.ticker,'1120');
+  const result = await collectCompanySources(bank.id, {fetchImpl: async url => {
+    if (url === release) return new Response(pdfFixture());
+    return htmlResponse(reportHtml.replace('</main>','<a href="https://objectstorage.me-jeddah-1.oraclecloud.com/restricted.pdf">Financial results Q3 2026</a></main>'));
+  }});
+  assert.ok(result.evidence.some(item=>item.url===release && item.kind==='pdf'));
+  assert.ok(result.evidence.every(item=>isAllowedCompanySourceUrl(bank.id,item.url)));
 });

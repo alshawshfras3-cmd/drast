@@ -1,5 +1,7 @@
 'use client';
 
+import { PILOT_COMPANIES } from '@/lib/pilot-catalog.mjs';
+
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowUpLeft, BookOpen, Building2, Calculator, Check, CheckCircle2, ChevronDown, ExternalLink, FileCheck2, FilePenLine, FileSearch, FileText, FolderOpen, Layers3, ListFilter, Network, Printer, Search, ShieldCheck, Sparkles, TriangleAlert, X, Download } from 'lucide-react';
@@ -70,7 +72,7 @@ export default function EntityDirectory({ studies, profiles, directory, initialQ
   const searching = !!query.trim();
   const found = entities.filter(entity => (filter === 'all' || (filter === 'strategic' ? entity.group === 'strategic' : entity.market === filter)) && companyMatches(entity, query));
   function availableResearchId(entity: Entity) {
-    const id=entity.profile?.id||entity.study?.researchCompanyId||({'4013':'hmg','2222':'aramco','2010':'sabic','7010':'stc','2280':'almarai','1820':'baan'} as Record<string,string>)[entity.ticker||''];
+    const id=entity.profile?.id||entity.study?.researchCompanyId||PILOT_COMPANIES.find(company=>company.ticker===entity.ticker)?.id;
     return id && researchIds.includes(id) ? id : null;
   }
   const selected = entities.find(entity => entity.id === selectedId);

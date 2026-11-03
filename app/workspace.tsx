@@ -8,6 +8,7 @@ import ResearchDesk from './research-desk';
 import EntityDirectory from './entity-directory';
 import FinancialReview, {type ReviewDocument} from './financial-review';
 import {strategicProfiles} from '@/lib/entity-profiles';
+import {PILOT_COMPANIES} from '@/lib/pilot-catalog.mjs';
 import listedDirectory from '@/data/listed-directory.json';
 import {companyMatches, exactCompanyMatch, marketLabel} from '@/lib/directory-search.mjs';
 import { documentPath, MAX_TEXT_BYTES } from '@/lib/access-policy.mjs';
@@ -50,8 +51,8 @@ export default function Workspace(){
  const [headerHidden,setHeaderHidden]=useState(false);
  const [directoryQuery,setDirectoryQuery]=useState('');
  const [launchQuery,setLaunchQuery]=useState(''),[launchCompanyId,setLaunchCompanyId]=useState('hmg'),[launchOpen,setLaunchOpen]=useState(false);
- const researchCompanies=[...seedStudies.map((s:Study)=>({id:s.researchCompanyId||({'4013':'hmg','2222':'aramco','2010':'sabic','7010':'stc','2280':'almarai','1820':'baan'} as Record<string,string>)[s.ticker]||s.id,name:niceName(s),ticker:s.ticker,sector:s.sector,entityKind:'listed' as const})),...strategicProfiles.map(profile=>({id:profile.id,name:profile.id==='kafd'?'كافد KAFD':profile.id==='humain'?'هيوماين HUMAIN':profile.name,ticker:'غير مدرجة',sector:profile.sector,entityKind:profile.entityKind==='project'?'project' as const:'private_company' as const}))];
- const launchAliases:Record<string,string[]>={hmg:['HMG','سليمان الحبيب'],aramco:['Saudi Aramco'],sabic:['SABIC'],stc:['Saudi Telecom','الاتصالات السعودية'],almarai:['Almarai'],baan:['Baan Holding','Alhokair','الحكير'],kafd:['KAFD','مركز الملك عبدالله المالي'],humain:['HUMAIN']};
+ const researchCompanies=[...seedStudies.map((s:Study)=>({id:s.researchCompanyId||({'4013':'hmg','2222':'aramco','2010':'sabic','7010':'stc','2280':'almarai','1820':'baan'} as Record<string,string>)[s.ticker]||s.id,name:niceName(s),ticker:s.ticker,sector:s.sector,entityKind:'listed' as const})),...PILOT_COMPANIES.filter(company=>company.ticker&&!seedStudies.some(study=>study.ticker===company.ticker)).map(company=>({id:company.id,name:company.name,ticker:company.ticker!,sector:company.sector,entityKind:'listed' as const})),...strategicProfiles.map(profile=>({id:profile.id,name:profile.id==='kafd'?'كافد KAFD':profile.id==='humain'?'هيوماين HUMAIN':profile.name,ticker:'غير مدرجة',sector:profile.sector,entityKind:profile.entityKind==='project'?'project' as const:'private_company' as const}))];
+ const launchAliases:Record<string,string[]>={hmg:['HMG','سليمان الحبيب'],aramco:['Saudi Aramco'],sabic:['SABIC'],stc:['Saudi Telecom','الاتصالات السعودية'],almarai:['Almarai'],alrajhi:['Al Rajhi Bank','الراجحي'],baan:['Baan Holding','Alhokair','الحكير'],kafd:['KAFD','مركز الملك عبدالله المالي'],humain:['HUMAIN']};
  const trackedByTicker=new Map(researchCompanies.filter(company=>company.entityKind==='listed').map(company=>[company.ticker,company]));
  const indexedTickers=new Set(listedDirectory.companies.map(company=>company.ticker));
  const launchCompanies=[
