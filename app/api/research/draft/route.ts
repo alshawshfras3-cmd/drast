@@ -1,7 +1,7 @@
 import {getResearchIssuer, libraryEvidence, libraryEvidenceId} from '@/lib/research-issuers.mjs';
 import { actor, readDocument, response } from '@/lib/repository';
 import { researchAccess, researchBody } from '@/lib/research-http';
-import { createSourcesOnlyReport, normalizeResearchRequest, validateEvidence } from '@/lib/research-contract.mjs';
+import { createCitedBrief, createSourcesOnlyReport, normalizeResearchRequest, validateEvidence } from '@/lib/research-contract.mjs';
 import { draftResearch, researchError } from '@/lib/research-ai';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -31,6 +31,13 @@ export async function POST(request: Request) {
     }
     return response(await draftResearch(input));
   }
-  catch (error) { const safe = researchError(error); return response({ error: safe.message, ...(safe.diagnostic ? {diagnostic:safe.diagnostic} : {}) }, safe.status); }
+  catch (error) {
+    const safe = researchError(error);
+    if (!safe.diagnostic) return response({error:safe.message},safe.status);
+    return response({
+      report:createCitedBrief(input,safe.message),mode:'sources_only',model:null,
+      draftingWarning:safe.message,diagnostic:safe.diagnostic,
+    });
+  }
 }
 

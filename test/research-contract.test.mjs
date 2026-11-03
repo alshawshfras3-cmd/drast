@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   normalizeResearchRequest, validateEvidence, preparePromptEvidence, buildResearchPrompt,
-  validateResearchReport, createSourcesOnlyReport,
+  validateResearchReport, createSourcesOnlyReport, createCitedBrief,
 } from '../lib/research-contract.mjs';
 
 const evidence = (overrides = {}) => ({
@@ -188,3 +188,15 @@ test('partial coverage appends a named limitation instead of fabricating the mis
   assert.doesNotMatch(draft.summary, /1,234|200/);
 });
 
+
+test('a rejected AI draft can leave a cited brief that preserves the source currency and failure reason', () => {
+  const source=evidence();
+  const reason='رفض المزوّد الوصول (UPSTREAM_403).';
+  const brief=createCitedBrief({companyIds:['hmg'],evidence:[source]},reason);
+  assert.match(brief.title,/موجز الإفصاحات/);
+  assert.match(brief.sections[0].body,/Revenue SAR 1,234\.50 million in 2026\./);
+  assert.match(brief.sections[0].body,/صفحة 1/);
+  assert.deepEqual(brief.sections[0].sourceIds,[source.id]);
+  assert.equal(brief.limitations[0],reason);
+  assert.doesNotMatch(JSON.stringify(brief),/USD/);
+});
