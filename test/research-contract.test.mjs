@@ -14,7 +14,7 @@ const evidence = (overrides = {}) => ({
 });
 const report = (overrides = {}) => ({
   title:'قراءة أولية لنتائج الحبيب', summary:'المقتطف يتضمن إيرادات، لكنه لا يكفي لتقييم جودة الأرباح.',
-  sections:[{title:'المعلومات المعلنة', body:'بلغت الإيرادات 1,234.50 مليون ريال بحسب المصدر. التدفقات النقدية غير متاحة في المقتطف، ولا تُعد صفرًا.', kind:'fact', sourceIds:['s-hmg']}],
+  sections:[{title:'المعلومات المعلنة', body:'التدفقات النقدية غير متاحة في المقتطف، ولا تُعد صفرًا.', kind:'fact', sourceIds:['s-hmg'], quoteRefs:['s-hmg:1']}],
   limitations:['تحتاج الجداول والإيضاحات إلى مراجعة المصدر الأصلي.'],
   nextWatch:['اقرأ التدفقات النقدية والديون قبل تقييم الملاءة.'],
   ...overrides,
@@ -160,11 +160,12 @@ test('financial number copy guard uses only cited documents, including summary a
   throwsCode(() => validateResearchReport(report({sections:[zeroFill]}), [evidence()]), 'UNSUPPORTED_FINANCIAL_NUMBER');
 });
 
-test('numeric guard accepts same copied values in Arabic digits and does not mistake years/pages for amounts', () => {
-  const body = 'أعلنت إيرادات ١٬٢٣٤٫٥٠ مليون ريال وهامشًا ١٦٫٢٪، كما ورد في الصفحة 1 لعام 2025؛ يلزم التحقق من الفترة.';
+test('the numeric guard preserves valid page references and rejects free-text Arabic amounts', () => {
+  const body = 'تظهر الإيرادات في الصفحة ١؛ يلزم التحقق من الفترة.';
   const item = {...report().sections[0], body};
-  assert.equal(validateResearchReport(report({sections:[item]}), [evidence()]).sections[0].body, body);
-  throwsCode(() => validateResearchReport(report({sections:[{...item, body:body.replace('الصفحة 1', 'الصفحة 8')}]}), [evidence()]), 'UNSUPPORTED_PAGE_REFERENCE');
+  assert.ok(validateResearchReport(report({sections:[item]}), [evidence()]).sections[0].body.startsWith(body));
+  throwsCode(() => validateResearchReport(report({sections:[{...item, body:'بلغت الإيرادات ١٬٢٣٤٫٥٠ مليون ريال.'}]}), [evidence()]), 'UNSUPPORTED_FINANCIAL_NUMBER');
+  throwsCode(() => validateResearchReport(report({sections:[{...item, body:body.replace('الصفحة ١', 'الصفحة ٨')}]}), [evidence()]), 'UNSUPPORTED_PAGE_REFERENCE');
 });
 
 test('malformed or overlong model output cannot be counted as a report', () => {
@@ -186,3 +187,4 @@ test('partial coverage appends a named limitation instead of fabricating the mis
   assert.match(draft.sections[0].body, /لم تُعتمد منه أرقام/);
   assert.doesNotMatch(draft.summary, /1,234|200/);
 });
+

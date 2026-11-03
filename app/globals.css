@@ -622,7 +622,15 @@ tr.emphasis td, tr.emphasis th { color: #85679c; font-weight: 500; }
   .print-report table { min-width: 0; width: 100%; font-size: 9px; }
   .print-report th, .print-report td { padding: 7px 9px; color: #51465c; }
   .print-report thead th { background: #f1ebf9; }
+  .print-report:has(.financial-fact-register) :is(th, td) { padding-block: 5px; }
+  .print-report .financial-fact-register > p { break-after: avoid; }
+  .print-report .financial-fact-register .table-scroll { overflow: visible; }
+  .print-report .financial-fact-register th,
+  .print-report .financial-fact-register td { padding: 4px 6px; }
+  .print-report .financial-fact-register bdi { white-space: nowrap; }
+  .print-report .financial-fact-register tr { break-inside: avoid; }
   .print-report footer { border-top: 1px solid #d8cbe9; margin-top: 25px; padding-top: 10px; font-size: 8px; }
+  .print-report:has(.financial-fact-register) footer { margin-top: 12px; }
   .print-report h1, .print-report h2, .print-report h3 { break-after: avoid; }
 }
 

@@ -47,3 +47,6 @@ yarn-error.log*
 
 # Vercel local linkage and downloaded environment
 /.vercel/
+
+# Prepared browser OCR runtime assets
+/public/ocr/

@@ -64,7 +64,8 @@ export function researchError(error: unknown): { message: string; status: number
 function researchErrorMessage(error: unknown): {message:string;status:number} {
   const validationCode = (error as any)?.code;
   const validationMessages: Record<string,string> = {
-    UNSUPPORTED_FINANCIAL_NUMBER: 'أوقف فحص الأرقام المسودة: تضمنت مبلغًا أو نسبة لا تطابق نص الأدلة المستشهد بها. لم تُعتمد هذه الأرقام.',
+    UNSUPPORTED_FINANCIAL_NUMBER: 'تضمنت المسودة رقمًا خارج اقتباسات الأدلة. أعد الصياغة باستخدام الاقتباسات المتاحة.',
+    INVALID_EVIDENCE_QUOTE: 'أشارت المسودة إلى اقتباس غير صالح من مصادر القسم. أعد الصياغة من الأدلة المتاحة.',
     UNSUPPORTED_PAGE_REFERENCE: 'أوقفت المراجعة المسودة لأن إحالة صفحة لم تظهر في مقتطفات المصدر.',
     UNKNOWN_REPORT_SOURCE: 'أوقفت المراجعة المسودة لأن النموذج أشار إلى معرّف مصدر غير مرفق.',
     UNSOURCED_REPORT_SECTION: 'أوقفت المراجعة المسودة لأن أحد أقسامها بلا مصدر.',
@@ -98,3 +99,4 @@ function researchErrorMessage(error: unknown): {message:string;status:number} {
   if ((error as any)?.name === 'TimeoutError' || (error as any)?.name === 'AbortError') return { status: 504, message: 'انتهت مهلة النموذج. المصادر محفوظة ويمكن استئناف الصياغة.' };
   return { status: 422, message: 'لم يجتز التقرير فحص البنية أو الاستشهادات أو اكتمل الرد بصورة غير صالحة. راجع المصادر وأعد الصياغة؛ لا تعتمد هذه المحاولة كتقرير.' };
 }
+

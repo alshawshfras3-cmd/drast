@@ -4,6 +4,7 @@ minimumReleaseAgeIgnoreMissingTime: false
 trustLockfile: false
 strictDepBuilds: true
 allowBuilds:
+  tesseract.js: false
   esbuild: true
   fsevents: true
   sharp: true
