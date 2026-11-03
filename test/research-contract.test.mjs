@@ -199,4 +199,5 @@ test('a rejected AI draft can leave a cited brief that preserves the source curr
   assert.deepEqual(brief.sections[0].sourceIds,[source.id]);
   assert.equal(brief.limitations[0],reason);
   assert.doesNotMatch(JSON.stringify(brief),/USD|\$/);
+  assert.doesNotMatch(buildResearchPrompt({companyIds:['hmg'],evidence:[source]}), /"text":"The balance was/);
 });

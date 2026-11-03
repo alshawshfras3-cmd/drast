@@ -30,7 +30,7 @@ function reportText(job: ResearchJob) {
     ...job.evidence.map(e => `[${e.id}] ${e.title}\n${e.url}\nتاريخ الجمع: ${date(e.checkedAt)}`), '', `أُعدت المسودة: ${date(job.completedAt || job.updatedAt)}`].join('\n');
 }
 async function digestFingerprint(job: ResearchJob, fingerprints: string[]) {
-  const stable = JSON.stringify({ draftPolicy: 'source-quotes-v1', companyIds: [...job.companyIds].sort(), question: job.question.trim().replace(/\s+/g, ' '), type: job.type, sources: fingerprints.sort() });
+  const stable = JSON.stringify({ draftPolicy: 'source-quotes-v2', companyIds: [...job.companyIds].sort(), question: job.question.trim().replace(/\s+/g, ' '), type: job.type, sources: fingerprints.sort() });
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(stable));
   return [...new Uint8Array(digest)].map(x => x.toString(16).padStart(2, '0')).join('');
 }
