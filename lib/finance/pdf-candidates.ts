@@ -119,6 +119,7 @@ export async function extractFinancialCandidates(path: string, documentPeriod: s
     const pdf = await task.promise;
     type Page = Awaited<ReturnType<typeof pdf.getPage>>;
     const scanned: Page[] = [];
+    const incomePagesNeedingOcr: Page[] = [];
     const textPages = [];
     const pages = Math.min(pdf.numPages, MAX_PAGES);
     if (pdf.numPages > pages) warnings.push('اقتصر البحث على أول 12 صفحة من المستند.');
@@ -140,18 +141,24 @@ export async function extractFinancialCandidates(path: string, documentPeriod: s
       });
       const text = content.items.map(item => 'str' in item ? item.str : '').join(' ');
       if (text.replace(/\s/g, '').length < 100) scanned.push(page);
-      textPages.push({ pageNumber, words, text });
+      textPages.push({ pageNumber, page, words, text });
     }
     const context = candidateContext(textPages.map(item => item.text).join(' '));
-    for (const { pageNumber, words } of textPages) {
-      rows.push(...parseFinancialPage(words, { documentPeriod, page: pageNumber, source: 'text', context }) as FinancialCandidate[]);
+    for (const { pageNumber, page, words, text } of textPages) {
+      const parsed = parseFinancialPage(words, { documentPeriod, page: pageNumber, source: 'text', context }) as FinancialCandidate[];
+      rows.push(...parsed);
+      // Some PDFs include a broken text overlay on top of an image table.
+      if (parsed.length < 8 && /statement of (?:profit\s+or\s+loss|income)|income statement|قائمة (?:الدخل|الربح أو الخسارة)/iu.test(text)) {
+        incomePagesNeedingOcr.push(page);
+      }
     }
-    if (scanned.length > OCR_PAGES) warnings.push('اقتصر التعرف البصري على أول ثماني صفحات مصوّرة ضمن النطاق.');
+    const ocrQueue = [...new Set([...incomePagesNeedingOcr, ...scanned])];
+    if (ocrQueue.length > OCR_PAGES) warnings.push('اقتصر التعرف البصري على أول ثماني صفحات مصوّرة ضمن النطاق.');
     // Skip OCR when a complete current and comparative income table already exists.
-    if (scanned.length && rows.length < 8) {
+    if (ocrQueue.length && rows.length < 8) {
       try {
         worker = await openOcrWorker(active);
-        for (const page of scanned.slice(0, OCR_PAGES)) {
+        for (const page of ocrQueue.slice(0, OCR_PAGES)) {
           active.throwIfAborted();
           const base = page.getViewport({ scale: 1 });
           const viewport = page.getViewport({ scale: Math.min(4.16, Math.sqrt(OCR_PIXELS/(base.width*base.height))) });
