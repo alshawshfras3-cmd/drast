@@ -190,6 +190,7 @@ export default function ResearchDesk({ companies, renderFinancialCharts, onOpenL
   async function runJob(original: ResearchJob) {
     const controller = new AbortController(); controllerRef.current = controller;
     let job = original;
+    const missingSources: string[] = [];
     setRunningId(job.id); setSelectedId(job.id);
     try {
       job = await persist({ ...job, status: 'collecting', error: undefined, issues: [], collectedCompanyIds: [], stage: 'يبدأ التحقق من المصادر الرسمية.' });
@@ -200,12 +201,13 @@ export default function ResearchDesk({ companies, renderFinancialCharts, onOpenL
         job = await persist({ ...job, stage: `يجمع مصادر ${companyName(companyId)} · ${nf.format(job.companyIds.indexOf(companyId) + 1)} من ${nf.format(job.companyIds.length)}` });
         const data = await requestJSON('/api/research/collect', { companyId }, controller.signal);
         const evidence: Evidence[] = Array.isArray(data.evidence) ? data.evidence.filter((e: Evidence) => e && e.companyId === companyId && typeof e.text === 'string' && e.text.trim()) : [];
+        if (!evidence.length && typeof data.summary === 'string') missingSources.push(`${companyName(companyId)} — ${data.summary}`);
         fingerprints.push(String(data.fingerprint || evidence.map(e => `${e.id}:${e.text}`).join('|')));
         job = await persist({ ...job, evidence: [...job.evidence.filter(e => e.companyId !== companyId), ...evidence], issues: [...new Set([...job.issues, ...(Array.isArray(data.issues) ? data.issues.map((x: unknown) => String(x)) : [])])], collectedCompanyIds: [...new Set([...job.collectedCompanyIds, companyId])] });
       }
       if (pauseRef.current) throw new DOMException('Paused', 'AbortError');
       if (!job.evidence.length) {
-        await persist({ ...job, status: 'blocked', stage: 'لم تتوفر مادة مصدرية قابلة للقراءة؛ لم تُنشأ دراسة.', error: 'لم يتوفر نص إفصاح صالح. راجع تفاصيل المصادر أو ارفع الإفصاح ثم أعد المحاولة.' });
+        await persist({ ...job, status: 'blocked', stage: 'لم تتوفر مادة مصدرية قابلة للقراءة؛ لم تُنشأ دراسة.', error: missingSources.join(' · ') || 'لم يتوفر نص إفصاح صالح. راجع تفاصيل المصادر ثم أعد المحاولة.' });
         return;
       }
       const fingerprint = await digestFingerprint(job, fingerprints);
@@ -221,7 +223,7 @@ export default function ResearchDesk({ companies, renderFinancialCharts, onOpenL
       await persist({ ...job, report: data.report as ResearchReport, mode: data.mode, model: data.model, status: data.mode === 'ai' ? 'ready' : 'sources_only', completedAt: new Date().toISOString(), stage: data.mode === 'ai' ? 'المسودة جاهزة للمراجعة البشرية.' : 'اكتمل حصر المصادر. افتح المراجع لمراجعة الأرقام.' });
     } catch (error) {
       const paused = pauseRef.current || (error instanceof DOMException && error.name === 'AbortError');
-      try { await persist({ ...job, status: paused ? 'paused' : 'failed', error: paused ? undefined : errorMessage(error), stage: paused ? 'توقفت المهمة. يمكنك استئنافها مع إعادة التحقق من المصادر.' : 'توقفت هذه المهمة؛ المصادر التي جُمعت محفوظة.' }); } catch { /* Keep the initial storage error visible. */ }
+      try { await persist({ ...job, status: paused ? 'paused' : 'failed', error: paused ? undefined : errorMessage(error), stage: paused ? 'توقفت المهمة. يمكنك استئنافها مع إعادة التحقق من المصادر.' : job.status === 'drafting' ? 'تعذّر إعداد المسودة. المصادر التي جُمعت محفوظة.' : 'تعذّر إكمال جمع المصادر.' }); } catch { /* Keep the initial storage error visible. */ }
     } finally { controllerRef.current = null; setRunningId(''); }
   }
   async function runQueue(onlyId?: string) {
