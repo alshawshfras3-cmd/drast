@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { collectedPdfRecord } from '../lib/finance/collected-pdf.mjs';
 import { collectCompanySources, validateSourceUrl } from '../lib/source-collector.mjs';
 import { getPilotCompany, isAllowedCompanySourceUrl, PILOT_COMPANIES } from '../lib/pilot-catalog.mjs';
 
@@ -124,4 +125,40 @@ test('unrendered Angular variables are not treated as current financial evidence
   const result = await collectCompanySources('hmg', { fetchImpl: async () => htmlResponse(template) });
   assert.equal(result.evidence.length, 0);
   assert.ok(result.issues.some(issue => issue.includes('ديناميكيًا')));
+});
+
+
+test('approved statement import receives original bytes and gives each revision a stable identity', async () => {
+  const original = pdfFixture();
+  const imports = [];
+  const url = getPilotCompany('almarai').sourceUrls[1];
+  const result = await collectCompanySources('almarai', {
+    fetchImpl: async requested => requested === url ? new Response(original) : htmlResponse(reportHtml),
+    importPdf: async (company, source, bytes) => {
+      const allowed = new Set(['almarai']);
+      assert.equal(collectedPdfRecord(company, source, bytes, new Set()), null);
+      assert.equal(collectedPdfRecord(company, {...source,url:source.url + '?alternate'}, bytes, allowed), null);
+      const document = collectedPdfRecord(company, source, bytes, allowed);
+      assert.equal(document.period, '2026-Q3');
+      assert.equal(document.ticker, '2280');
+      assert.equal(document.pageCount, 1);
+      assert.equal(new TextDecoder().decode(bytes), original);
+      assert.equal(collectedPdfRecord(company, source, bytes, allowed).id, document.id);
+      assert.notEqual(collectedPdfRecord(company, source, new TextEncoder().encode(original + '\n'), allowed).id, document.id);
+      imports.push(document);
+      return true;
+    },
+  });
+  assert.equal(imports.length, 1, JSON.stringify(result.issues));
+  assert.ok(result.evidence.some(item => item.url === url));
+  assert.ok(result.issues.some(issue => issue.includes('استُورد')));
+});
+
+test('archive failure keeps source evidence available for drafting', async () => {
+  const result = await collectCompanySources('almarai', {
+    fetchImpl: async () => new Response(pdfFixture()),
+    importPdf: async () => { throw new Error('storage unavailable'); },
+  });
+  assert.ok(result.evidence.length > 0);
+  assert.ok(result.issues.some(issue => issue.includes('تعذّر استيراد')));
 });
