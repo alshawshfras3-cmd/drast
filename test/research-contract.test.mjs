@@ -190,7 +190,7 @@ test('partial coverage appends a named limitation instead of fabricating the mis
 
 
 test('a rejected AI draft can leave a cited brief that preserves the source currency and failure reason', () => {
-  const source=evidence();
+  const source=evidence({text:evidence().text+'\nThe balance was $ 1,012 million.'});
   const reason='رفض المزوّد الوصول (UPSTREAM_403).';
   const brief=createCitedBrief({companyIds:['hmg'],evidence:[source]},reason);
   assert.match(brief.title,/موجز الإفصاحات/);
@@ -198,5 +198,5 @@ test('a rejected AI draft can leave a cited brief that preserves the source curr
   assert.match(brief.sections[0].body,/صفحة 1/);
   assert.deepEqual(brief.sections[0].sourceIds,[source.id]);
   assert.equal(brief.limitations[0],reason);
-  assert.doesNotMatch(JSON.stringify(brief),/USD/);
+  assert.doesNotMatch(JSON.stringify(brief),/USD|\$/);
 });
