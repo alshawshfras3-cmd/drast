@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { documentPath } from '../lib/access-policy.mjs';
 import { createRepository } from '../lib/repository-core.mjs';
+import { reviewedFactAnswer } from '../lib/finance/reviewed-fact-answer.mjs';
 import { analyzeStudy } from '../lib/study-engine.mjs';
 
 const owner = 'private-workspace';
@@ -106,4 +107,23 @@ test('a prior-year standalone quarter can cite the comparative column of the cur
   assert.equal(reviewed.financialFacts[1].documentPeriod,'2026-Q3');
   await assert.rejects(repo.saveStudy(owner,{...input,financialFacts:[fact,{...comparative,period:'2025-Q2'}]},true));
   await assert.rejects(repo.saveStudy(owner,{...input,financialFacts:[fact,{...comparative,metric:'cash',basis:'closing_balance'}]},true));
+});
+
+test('Arabic answers use only the persisted reviewed facts and preserve SAR scale and citations', async () => {
+  const {repo} = setup();
+  const study = await repo.saveStudy(owner, input, true);
+  const saved = await repo.readReviewedStudy(owner, study.id);
+  const answer = reviewedFactAnswer(saved, 'كم بلغت الإيرادات في آخر ربع؟');
+  assert.equal(answer.status, 'answer');
+  assert.deepEqual(answer.rows[0], {
+    period:'2026-Q3', value:'1200000', unit:'ألف ريال سعودي',
+    citation:{documentId:docId, documentName:'تقرير تجريبي.pdf', ...fact.cell},
+  });
+  const comparison = reviewedFactAnswer(saved, 'الإيرادات في ٢٠٢٦-Q3 مقابل ٢٠٢٥-Q3');
+  assert.deepEqual(comparison.rows[1], {period:'2025-Q3'});
+  assert.deepEqual(reviewedFactAnswer(saved, 'كم صافي الربح في آخر ربع؟').rows, [{period:'2026-Q3'}]);
+  assert.equal(reviewedFactAnswer(saved, 'لماذا ارتفعت الإيرادات في آخر ربع؟').status, 'clarify');
+  assert.equal(reviewedFactAnswer(input, 'كم الإيرادات في آخر ربع؟').status, 'unreviewed');
+  assert.equal(await repo.readReviewedStudy(owner, 'almarai-import'), null);
+  await assert.rejects(repo.readReviewedStudy('other', study.id), /مساحة غير مصرح بها/);
 });

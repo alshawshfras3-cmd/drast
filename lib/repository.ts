@@ -8,5 +8,6 @@ export function response(data: unknown, status = 200) {
   return Response.json(data, { status, headers: { 'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff' } });
 }
 const repository = createRepository(storage, seedStudies);
-export const { listStudies, saveStudy, listDocuments, readDocument, saveDocument, readFile } = repository;
+export const { listStudies, readReviewedStudy, saveStudy, listDocuments, readDocument, saveDocument, readFile } = repository;
 export async function getStudy(owner: string, id: string) { return (await listStudies(owner)).find((study: any) => study.id === id) || null; }
+
