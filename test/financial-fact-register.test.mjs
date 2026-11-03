@@ -97,3 +97,13 @@ test('year-over-year comparisons use the same quarter and statement scope from t
   assert.equal(row.fieldSources.previousYearRevenue,prior.id);
   assert.equal(reviewed.quarters.length,1);
 });
+
+test('a prior-year standalone quarter can cite the comparative column of the current filing', async () => {
+  const {repo} = setup();
+  const comparative = {...fact,period:'2025-Q3',documentPeriod:'2026-Q3',rawValue:'1000000',cell:{...fact.cell,column:'July–September 2025'}};
+  const reviewed = await repo.saveStudy(owner,{...input,financialFacts:[fact,comparative]},true);
+  assert.ok(Math.abs(analyzeStudy(reviewed).quarters[0].revenueYoY-20)<1e-10);
+  assert.equal(reviewed.financialFacts[1].documentPeriod,'2026-Q3');
+  await assert.rejects(repo.saveStudy(owner,{...input,financialFacts:[fact,{...comparative,period:'2025-Q2'}]},true));
+  await assert.rejects(repo.saveStudy(owner,{...input,financialFacts:[fact,{...comparative,metric:'cash',basis:'closing_balance'}]},true));
+});

@@ -72,10 +72,11 @@ export default function Workspace(){
      const hasFacts=input && typeof input==='object' && ('financialFacts' in input || 'financialFactsVersion' in input);
      if(hasFacts && !window.confirm('أكد أنك طابقت القيم والعملات والفترات ونطاق القوائم ومواضع الخلايا مع المستندات الأصلية. سيحفظ دراسات لقطة مستقلة لهذه المراجعة.'))return;
      const r=await fetch('/api/studies',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({study:input,confirmFinancialFacts:hasFacts===true})});
-     const d=await r.json();
-     if(!r.ok)throw Error(d.error);
-     setStudies(v=>[...v.filter(x=>x.id!==d.study.id),d.study]);
-     setActiveId(d.study.id);
+     const d=await r.json() as {error?:string;study?:Study};
+     const saved=d.study;
+     if(!r.ok||typeof saved?.id!=='string')throw Error(d.error||'تعذّر قراءة الدراسة المحفوظة.');
+     setStudies(v=>[...v.filter(x=>x.id!==saved.id),saved]);
+     setActiveId(saved.id);
      if(hasFacts)setTab('numbers');
      setNav('studies');
      setNotice(hasFacts?'حُفظت لقطة الحقائق المراجعة وحُسبت المقارنة منها.':'تم استيراد الدراسة والتحقق من بنيتها.');
