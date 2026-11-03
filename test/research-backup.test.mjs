@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import ts from 'typescript';
 const source = await readFile(new URL('../app/pilot-browser-store.ts', import.meta.url), 'utf8');
 const compiled = ts.transpileModule(source, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } }).outputText
-  .replace('@/lib/pilot-catalog.mjs', new URL('../lib/pilot-catalog.mjs', import.meta.url).href);
+  .replace('@/lib/research-issuers.mjs', new URL('../lib/research-issuers.mjs', import.meta.url).href);
 const { parseResearchBackup } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`);
 const sample = () => ({ id: 'job-1', companyIds: ['aramco'], question: 'سؤال', type: 'results', status: 'paused', createdAt: '2026-11-02T09:00:00Z', updatedAt: '2026-11-02T09:00:00Z', day: '2026-11-02', evidence: [], issues: [], collectedCompanyIds: [] });
 test('single report exports and complete backups restore without losing manual text', () => {
@@ -22,3 +22,4 @@ test('an interrupted task resumes and an unavailable duplicate target is recheck
     assert.equal(restored.status, 'paused'); assert.equal(restored.duplicateOf, undefined);
   }
 });
+
