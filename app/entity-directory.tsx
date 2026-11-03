@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowUpLeft, BookOpen, Building2, Calculator, Check, CheckCircle2, ChevronDown, ExternalLink, FileCheck2, FilePenLine, FileSearch, FileText, FolderOpen, Layers3, ListFilter, Network, Printer, Search, ShieldCheck, Sparkles, TriangleAlert, X, Download } from 'lucide-react';
 import { isSafeSourceUrl } from '@/lib/study-engine.mjs';
+import { companyMatches, marketLabel } from '@/lib/directory-search.mjs';
 
 export type StrategicProfile = {
   id: string; name?: string; company?: string; displayName?: string; englishName?: string;
@@ -12,18 +13,24 @@ export type StrategicProfile = {
   sources?: { id: string; title?: string; url: string; publishedAt?: string | null; locator?: string; verification?: string }[];
   limitations?: string[]; nextWatch?: string[];
 };
-type FinancialStudy = { id: string; company: string; ticker: string; sector?: string; quarters?: unknown[]; coverage?: string; sources?: unknown[]; researchCompanyId?: string };
+type FinancialStudy = { id: string; company: string; ticker: string; sector?: string; quarters?: unknown[]; coverage?: string; sources?: unknown[]; researchCompanyId?: string; asOf?: string; updatedAt?: string };
 type ListedRecord = { name: string; ticker: string; market: string; sector?: string; searchAliases?: string[] };
 export type ListedDirectory = { asOf?: string; sourceUrl?: string; sourceTitle?: string; sourceLanguage?: string; sourceAsOf?: string | null; coverage?: string; companies?: ListedRecord[] };
 type Entity = { id: string; name: string; sourceName?: string; englishName?: string; ticker?: string; market?: string; sector?: string; searchAliases?: string[]; group: 'listed' | 'strategic'; tracked: boolean; hasStudy: boolean; study?: FinancialStudy; profile?: StrategicProfile };
 const nf = new Intl.NumberFormat('ar-SA');
 const names: Record<string, string> = { '4013': 'سليمان الحبيب', '2222': 'أرامكو السعودية', '2010': 'سابك', '7010': 'stc', '2280': 'المراعي', '1820': 'بان القابضة' };
 const kindLabels: Record<string, string> = { fact: 'حقيقة من المصدر', management: 'تصريح أو توجه معلن', analysis: 'استنتاج تحليلي', scenario: 'سيناريو محتمل' };
-function normalize(value: string) {
-  return value.normalize('NFKD').replace(/[\u064B-\u065F\u0670\u0640]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/[٠-٩]/g, digit => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit))).toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+function preferredStudies(studies: FinancialStudy[]) {
+  const preferred = new Map<string, FinancialStudy>();
+  const ordered = [...studies].sort((a,b)=>
+    Number(Boolean(b.quarters?.length))-Number(Boolean(a.quarters?.length)) ||
+    (b.asOf??'').localeCompare(a.asOf??'') || (b.updatedAt??'').localeCompare(a.updatedAt??'')
+  );
+  for (const study of ordered) if (!preferred.has(String(study.ticker))) preferred.set(String(study.ticker), study);
+  return [...preferred.values()];
 }
 function profileName(profile: StrategicProfile) { return profile.name || profile.displayName || profile.company || profile.id; }
-function marketName(market?: string) { return market === 'main' ? 'السوق الرئيسية' : market === 'nomu' ? 'نمو' : market || 'شركة مدرجة'; }
+function marketName(market?: string) { return marketLabel(market); }
 function scrollTo(id: string) {
   requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }));
 }
@@ -41,16 +48,15 @@ const platformRoles = [
   { title: 'المحرر', icon: FilePenLine, state: 'واجهة ومراجعة بشرية', description: 'يتيح لك مراجعة المسودة وتعديل نصها وحفظ نسختك وتصديرها وطباعتها من المنصة.' },
 ];
 
-export default function EntityDirectory({ studies, profiles, directory, onOpenStudy, onStartResearch }: { studies: FinancialStudy[]; profiles: StrategicProfile[]; directory: ListedDirectory; onOpenStudy: (study: FinancialStudy) => void; onStartResearch?: (companyId: string) => void }) {
-  const [query, setQuery] = useState('');
-  const [filter, setFilter] = useState<'all' | 'listed' | 'strategic'>('all');
-  const [expanded, setExpanded] = useState(false);
+export default function EntityDirectory({ studies, profiles, directory, initialQuery = '', onOpenStudy, onStartResearch, researchIds = [] }: { studies: FinancialStudy[]; profiles: StrategicProfile[]; directory: ListedDirectory; initialQuery?: string; researchIds?: string[]; onOpenStudy: (study: FinancialStudy) => void; onStartResearch?: (companyId: string) => void }) {
+  const [query, setQuery] = useState(initialQuery);
+  const [filter, setFilter] = useState<'all' | 'main' | 'nomu' | 'strategic'>('all');
   const [selectedId, setSelectedId] = useState('');
   const [printProfile, setPrintProfile] = useState<StrategicProfile | null>(null);
   const [limit, setLimit] = useState(24);
   const listed = Array.isArray(directory.companies) ? directory.companies : [];
   const tracked = useMemo<Entity[]>(() => [
-    ...studies.map(study => {
+    ...preferredStudies(studies).map(study => {
       const record = listed.find(item => item.ticker === String(study.ticker));
       return { id: `listed-${study.ticker}`, name: names[study.ticker] || study.company, sourceName: record?.name, ticker: String(study.ticker), market: record?.market, sector: study.sector, searchAliases: record?.searchAliases, group: 'listed' as const, tracked: true, hasStudy: Array.isArray(study.quarters) && study.quarters.length > 0, study };
     }),
@@ -59,16 +65,19 @@ export default function EntityDirectory({ studies, profiles, directory, onOpenSt
   const entities = useMemo<Entity[]>(() => {
     const trackedTickers = new Set(tracked.flatMap(entity => entity.ticker ? [entity.ticker] : []));
     const seen = new Set<string>();
-    return [...tracked, ...listed.filter(record => { if (!record.ticker || trackedTickers.has(record.ticker) || seen.has(record.ticker)) return false; seen.add(record.ticker); return true; }).map(record => ({ id: `listed-${record.ticker}`, name: record.name, sourceName: record.name, ticker: String(record.ticker), market: record.market, sector: record.sector, searchAliases: record.searchAliases, group: 'listed' as const, tracked: false, hasStudy: false }))];
+    return [...tracked, ...listed.filter(record => { if (!record.ticker || trackedTickers.has(record.ticker) || seen.has(record.ticker)) return false; seen.add(record.ticker); return true; }).map(record => ({ id: `listed-${record.ticker}`, name: record.searchAliases?.[0] ?? record.name, sourceName: record.name, ticker: String(record.ticker), market: record.market, sector: record.sector, searchAliases: record.searchAliases, group: 'listed' as const, tracked: false, hasStudy: false }))];
   }, [tracked, listed]);
   const searching = !!query.trim();
-  const base = expanded || searching ? entities : tracked;
-  const found = base.filter(entity => (filter === 'all' || entity.group === filter) && normalize(`${entity.name} ${entity.sourceName || ''} ${entity.englishName || ''} ${entity.ticker || ''} ${entity.sector || ''} ${(entity.searchAliases || []).join(' ')}`).includes(normalize(query)));
+  const found = entities.filter(entity => (filter === 'all' || (filter === 'strategic' ? entity.group === 'strategic' : entity.market === filter)) && companyMatches(entity, query));
+  function availableResearchId(entity: Entity) {
+    const id=entity.profile?.id||entity.study?.researchCompanyId||({'4013':'hmg','2222':'aramco','2010':'sabic','7010':'stc','2280':'almarai','1820':'baan'} as Record<string,string>)[entity.ticker||''];
+    return id && researchIds.includes(id) ? id : null;
+  }
   const selected = entities.find(entity => entity.id === selectedId);
   const financialStudyCount = tracked.filter(entity => entity.group === 'listed' && entity.hasStudy).length;
   const profileCount = tracked.filter(entity => entity.group === 'strategic').length;
-  const referenceOnlyCount = entities.filter(entity => !entity.tracked).length;
-  useEffect(() => { setLimit(24); }, [query, filter, expanded]);
+  useEffect(() => { setQuery(initialQuery); setFilter('all'); }, [initialQuery]);
+  useEffect(() => { setLimit(24); }, [query, filter]);
   useEffect(() => {
     if (!printProfile) return;
     document.body.classList.add('entity-print-mode');
@@ -91,10 +100,10 @@ export default function EntityDirectory({ studies, profiles, directory, onOpenSt
       <div><span className="ed-stat-icon blue"><Layers3 size={20}/></span><span>ملفات استراتيجية<strong>{nf.format(profileCount)}<small>لجهات غير مدرجة</small></strong></span></div>
       <div><span className="ed-stat-icon peach"><BookOpen size={20}/></span><span>أسماء في المرجع الرسمي<strong>{nf.format(listed.length)}<small>هويات، وليست دراسات جاهزة</small></strong></span></div>
     </div>
-    <div className="ed-intro"><div><span className="eyebrow">الدراسة تبدأ بمعرفة ما نغطيه</span><h2>الفهرس والدراسات</h2><p>ابدأ بالجهات التي نتابعها، أو ابحث في فهرس الأسماء المدرجة. تظهر حالة كل ملف بوضوح قبل فتحه.</p></div></div>
-    <div className="ed-controls"><label className="ed-search"><Search size={19}/><span className="sr-only">ابحث في الفهرس باسم الجهة أو رمز التداول</span><input value={query} onChange={event => setQuery(event.target.value)} placeholder="ابحث باسم الجهة أو رمز التداول…"/>{query && <button onClick={() => setQuery('')} aria-label="مسح البحث"><X size={16}/></button>}</label><div className="ed-filters" role="group" aria-label="نوع الجهات">{([{ id: 'all', label: 'الكل' }, { id: 'listed', label: 'مدرجة' }, { id: 'strategic', label: 'مشاريع وشركات خاصة' }] as const).map(item => <button key={item.id} className={filter === item.id ? 'active' : ''} aria-pressed={filter === item.id} onClick={() => setFilter(item.id)}>{item.label}</button>)}</div></div>
-    {directory.sourceLanguage === 'en' && <p className="ed-search-note">تُحفظ أسماء تداول كما نُشرت بالإنجليزية، مع مرادفات عربية مختارة لتسهيل البحث.</p>}<div className="ed-list-heading"><span><ListFilter size={15}/>{searching ? 'نتائج البحث في الفهرس' : expanded ? 'المتابعة والفهرس المرجعي' : 'ملفات المتابعة'}<strong>{nf.format(found.length)}</strong></span>{!searching && <button onClick={() => setExpanded(value => !value)}>{expanded ? 'العودة إلى ملفات المتابعة' : `عرض بقية الفهرس · ${nf.format(referenceOnlyCount)} اسم`}<ArrowLeft size={14}/></button>}</div>
-    {!found.length ? <div className="ed-no-results"><Search size={28}/><h3>لا توجد نتائج مطابقة</h3><p>جرّب رمز التداول أو الاسم الإنجليزي الوارد في مرجع تداول. تتوفر مرادفات بحث عربية مختارة، ولا تمثل ترجمة لجميع أسماء الفهرس.</p><button className="btn secondary" onClick={() => { setQuery(''); setFilter('all'); }}>مسح الفلاتر</button></div> : <div className="ed-grid">{found.slice(0, limit).map(entity => <article className={`ed-card ${entity.group} ${entity.tracked ? 'tracked' : 'reference-only'}`} key={entity.id}><div className="ed-card-top"><span className={`ed-entity-icon ${entity.profile?.id || ''}`}>{entity.group === 'strategic' ? <Layers3 size={23}/> : <Building2 size={23}/>}</span><span className={`ed-availability ${entity.hasStudy ? 'available' : ''}`}>{entity.profile ? 'ملف استراتيجي' : entity.hasStudy ? 'دراسة مالية متاحة' : entity.tracked ? 'ملف متابعة' : 'هوية مفهرسة'}</span></div><h3 dir={entity.tracked ? 'auto' : 'ltr'}>{entity.name}</h3>{entity.sourceName && entity.sourceName !== entity.name && <p className="ed-source-name" dir="ltr">{entity.sourceName}</p>}{entity.englishName && <p className="ed-source-name" dir="ltr">{entity.englishName}</p>}<div className="ed-entity-meta">{entity.group === 'listed' ? <><span className="ed-ticker" dir="ltr">{entity.ticker}</span><span>{marketName(entity.market)}</span></> : <span>{entity.profile?.entityKind === 'project' ? 'مشروع وجهة أعمال' : 'شركة خاصة'} · غير مدرجة</span>}{entity.sector && <span>{entity.sector}</span>}</div><p className="ed-card-description">{entity.profile ? 'قراءة استراتيجية من مصادر موثقة، دون افتراض أرباح ربعية أو رمز تداول.' : entity.hasStudy ? 'دراسة تتضمن بيانات ربعية مسجلة ومراجع؛ راجع حدودها وتاريخ قطعها.' : entity.tracked ? 'الجمع مهيّأ في مكتب البحث؛ لم تُسجل أرقام ربعية معتمدة في هذا الملف بعد.' : 'الهوية مفهرسة؛ الجمع والدراسة التلقائية لم تُهيأ بعد.'}</p><div className="ed-card-bottom">{entity.tracked&&onStartResearch?<div className="ed-study-actions"><button className="ed-start-study" onClick={()=>{const id=entity.profile?.id||entity.study?.researchCompanyId||({'4013':'hmg','2222':'aramco','2010':'sabic','7010':'stc','2280':'almarai','1820':'baan'} as Record<string,string>)[entity.ticker||''];if(id)onStartResearch(id)}}><Sparkles size={14}/>ابدأ الدراسة<ArrowLeft size={15}/></button>{entity.study&&entity.hasStudy?<button className="ed-saved-study" onClick={()=>onOpenStudy(entity.study!)}>عرض الدراسة المحفوظة</button>:entity.profile?<button className="ed-saved-study" onClick={()=>openProfile(entity)}>قراءة الملف المحفوظ</button>:null}</div>:entity.study?<button onClick={()=>onOpenStudy(entity.study!)}>{entity.hasStudy?'فتح الدراسة المالية':'فتح ملف المتابعة'}<ArrowLeft size={16}/></button>:entity.profile?<button onClick={()=>openProfile(entity)}>قراءة الملف الاستراتيجي<ArrowLeft size={16}/></button>:directory.sourceUrl&&isSafeSourceUrl(directory.sourceUrl)?<a href={directory.sourceUrl} target="_blank" rel="noopener noreferrer">مرجع الهوية الرسمي<ExternalLink size={14}/></a>:<span>مرجع الهوية غير متاح</span>}</div></article>)}</div>}
+    <div className="ed-intro"><div><span className="eyebrow">الدراسة تبدأ بمعرفة ما نغطيه</span><h2>الفهرس والدراسات</h2><p>تصفح شركات السوق الرئيسية ونمو، أو ابحث بالاسم ورمز التداول. تظهر حالة البحث والدراسة على بطاقة الشركة.</p></div></div>
+    <div className="ed-controls"><label className="ed-search"><Search size={19}/><span className="sr-only">ابحث في الفهرس باسم الجهة أو رمز التداول</span><input value={query} onChange={event => setQuery(event.target.value)} placeholder="ابحث باسم الجهة أو رمز التداول…"/>{query && <button onClick={() => setQuery('')} aria-label="مسح البحث"><X size={16}/></button>}</label><div className="ed-filters" role="group" aria-label="نوع الجهات">{([{ id: 'all', label: 'الكل' }, { id: 'main', label: 'السوق الرئيسية' }, { id: 'nomu', label: 'نمو' }, { id: 'strategic', label: 'مشاريع وشركات خاصة' }] as const).map(item => <button key={item.id} className={filter === item.id ? 'active' : ''} aria-pressed={filter === item.id} onClick={() => setFilter(item.id)}>{item.label}</button>)}</div></div>
+    {directory.sourceLanguage === 'en' && <p className="ed-search-note">تُحفظ أسماء تداول كما نُشرت بالإنجليزية، مع مرادفات عربية مختارة لتسهيل البحث.</p>}<div className="ed-list-heading"><span><ListFilter size={15}/>{searching ? 'نتائج البحث في الفهرس' : 'الجهات في الفهرس'}<strong>{nf.format(found.length)}</strong></span></div>
+    {!found.length ? <div className="ed-no-results"><Search size={28}/><h3>لا توجد نتائج مطابقة</h3><p>جرّب رمز التداول أو الاسم الإنجليزي الوارد في مرجع تداول. تتوفر مرادفات بحث عربية مختارة، ولا تمثل ترجمة لجميع أسماء الفهرس.</p><button className="btn secondary" onClick={() => { setQuery(''); setFilter('all'); }}>مسح الفلاتر</button></div> : <div className="ed-grid">{found.slice(0, limit).map(entity => <article className={`ed-card ${entity.group} ${entity.tracked ? 'tracked' : 'reference-only'}`} key={entity.id}><div className="ed-card-top"><span className={`ed-entity-icon ${entity.profile?.id || ''}`}>{entity.group === 'strategic' ? <Layers3 size={23}/> : <Building2 size={23}/>}</span><span className={`ed-availability ${entity.hasStudy ? 'available' : ''}`}>{entity.profile ? 'ملف استراتيجي' : entity.hasStudy ? 'دراسة مالية متاحة' : entity.tracked ? 'ملف متابعة' : 'هوية مفهرسة'}</span></div><h3 dir={entity.tracked ? 'auto' : 'ltr'}>{entity.name}</h3>{entity.sourceName && entity.sourceName !== entity.name && <p className="ed-source-name" dir="ltr">{entity.sourceName}</p>}{entity.englishName && <p className="ed-source-name" dir="ltr">{entity.englishName}</p>}<div className="ed-entity-meta">{entity.group === 'listed' ? <><span className="ed-ticker" dir="ltr">{entity.ticker}</span><span>{marketName(entity.market)}</span></> : <span>{entity.profile?.entityKind === 'project' ? 'مشروع وجهة أعمال' : 'شركة خاصة'} · غير مدرجة</span>}{entity.sector && <span>{entity.sector}</span>}</div><p className="ed-card-description">{entity.profile ? 'قراءة استراتيجية من مصادر موثقة، دون افتراض أرباح ربعية أو رمز تداول.' : entity.hasStudy ? 'دراسة تتضمن بيانات ربعية مسجلة ومراجع؛ راجع حدودها وتاريخ قطعها.' : entity.tracked ? 'الجمع مهيّأ في مكتب البحث؛ لم تُسجل أرقام ربعية معتمدة في هذا الملف بعد.' : 'الهوية مفهرسة؛ الجمع والدراسة التلقائية لم تُهيأ بعد.'}</p><div className="ed-card-bottom">{availableResearchId(entity)&&onStartResearch?<div className="ed-study-actions"><button className="ed-start-study" onClick={()=>{const id=availableResearchId(entity);if(id)onStartResearch(id)}}><Sparkles size={14}/>ابدأ الدراسة<ArrowLeft size={15}/></button>{entity.study&&entity.hasStudy?<button className="ed-saved-study" onClick={()=>onOpenStudy(entity.study!)}>عرض الدراسة المحفوظة</button>:entity.profile?<button className="ed-saved-study" onClick={()=>openProfile(entity)}>قراءة الملف المحفوظ</button>:null}</div>:entity.study?<button onClick={()=>onOpenStudy(entity.study!)}>{entity.hasStudy?'فتح الدراسة المالية':'فتح ملف المتابعة'}<ArrowLeft size={16}/></button>:entity.profile?<button onClick={()=>openProfile(entity)}>قراءة الملف الاستراتيجي<ArrowLeft size={16}/></button>:directory.sourceUrl&&isSafeSourceUrl(directory.sourceUrl)?<a href={directory.sourceUrl} target="_blank" rel="noopener noreferrer">مرجع الهوية الرسمي<ExternalLink size={14}/></a>:<span>مرجع الهوية غير متاح</span>}</div></article>)}</div>}
     {found.length > limit && <button className="btn secondary ed-load-more" onClick={() => setLimit(value => value + 48)}>عرض مزيد من الأسماء<span>{nf.format(found.length - limit)} متبقية</span><ChevronDown size={16}/></button>}
     <details className="ed-reference-note"><summary><ShieldCheck size={17}/>عن مرجع الفهرس وحدود التغطية<ChevronDown size={16}/></summary><div><p>{directory.coverage || 'هذا فهرس هويات مرجعي؛ لا يضمن وجود دراسة أو موصل جمع لكل اسم.'}</p><div className="ed-reference-meta"><span>تاريخ قراءة المرجع: <bdi>{directory.asOf || 'غير مذكور'}</bdi></span><span>آخر تحديث للمصدر: {directory.sourceAsOf || 'غير مثبت'}</span>{directory.sourceLanguage === 'en' && <span>أسماء المصدر بالإنجليزية، مع مرادفات بحث عربية مختارة</span>}</div>{directory.sourceUrl && isSafeSourceUrl(directory.sourceUrl) && <a href={directory.sourceUrl} target="_blank" rel="noopener noreferrer">{directory.sourceTitle || 'فتح مرجع تداول الرسمي'}<ExternalLink size={14}/></a>}</div></details>
 
@@ -104,3 +113,4 @@ export default function EntityDirectory({ studies, profiles, directory, onOpenSt
     {printProfile && createPortal(<div className="entity-print-report" dir="rtl"><header><span>دراسات · مساحة البحث المالي</span><strong>ملف استراتيجي · جهة غير مدرجة</strong></header><div>{profileText(printProfile)}</div><footer>هذا الملف مبني على المصادر المسجلة وحدودها، ولا يمثل مقارنة أرباح ربعية .</footer></div>, document.body)}
   </section>;
 }
+

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import './financial-review.css';
 import './research.css';
 import './entity-directory.css';
 import './brand.css';

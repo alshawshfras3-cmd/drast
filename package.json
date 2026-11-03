@@ -7,8 +7,8 @@
   },
   "scripts": {
     "install:ci": "bash scripts/install-pnpm.sh",
-    "dev": "next dev",
-    "build": "next build --webpack",
+    "dev": "node scripts/prepare-ocr-assets.mjs && next dev",
+    "build": "node scripts/prepare-ocr-assets.mjs && next build --webpack",
     "start": "next start",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
@@ -42,6 +42,8 @@
     "recharts": "^3.8.0",
     "sonner": "^2.0.8",
     "tailwind-merge": "3.6.0",
+    "tesseract.js": "6.0.1",
+    "@tesseract.js-data/eng": "1.0.0",
     "unpdf": "^1.9.1",
     "vaul": "^1.1.2",
     "zod": "^3.25.76"
@@ -76,3 +78,4 @@
   },
   "packageManager": "pnpm@11.25.0"
 }
+

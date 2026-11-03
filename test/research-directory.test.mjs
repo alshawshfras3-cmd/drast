@@ -29,3 +29,15 @@ test('strategic studies retain references and do not enter the quarterly listed-
     }
   }
 });
+
+
+test('directory search finds major issuers by Arabic alias, English name and Arabic ticker', async () => {
+  const {companyMatches, exactCompanyMatch} = await import('../lib/directory-search.mjs');
+  const {companies} = await read('listed-directory');
+  for (const [name,ticker] of [['الراجحي','1120'], ['الأهلي','1180'], ['الإنماء','1150'], ['معادن','1211'], ['أكوا باور','2082']]) {
+    assert.ok(companies.some(company => company.ticker === ticker && companyMatches(company,name)));
+  }
+  assert.deepEqual(companies.filter(company => exactCompanyMatch(company,'١١٢٠')).map(company => company.ticker),['1120']);
+  assert.deepEqual(companies.filter(company => exactCompanyMatch(company,'۱۱۲۰')).map(company => company.ticker),['1120']);
+  assert.ok(companies.some(company => company.ticker === '1120' && companyMatches(company,'Al Rajhi Bank')));
+});
