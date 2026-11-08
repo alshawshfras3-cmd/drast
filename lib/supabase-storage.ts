@@ -144,20 +144,20 @@ export async function verifyStorageConnection() {
 }
 
 export const storage = {
-  async read(pathname: string) {
+  async read(pathname: string, signal?: AbortSignal) {
     recordPath(pathname);
-    const result = await supabaseFetch('/rest/v1/drast_records?' + query({owner:`eq.${OWNER}`,pathname:`eq.${pathname}`,select:'payload',limit:'1'}));
+    const result = await supabaseFetch('/rest/v1/drast_records?' + query({owner:`eq.${OWNER}`,pathname:`eq.${pathname}`,select:'payload',limit:'1'}), {signal});
     requireSuccess(result, 'قراءة السجل');
     const rows = await result.json();
     if (!Array.isArray(rows)) throw new SupabaseStorageError('استجابة قراءة السجل غير صالحة.');
     return rows[0]?.payload ?? null;
   },
-  async write(pathname: string, value: unknown) {
+  async write(pathname: string, value: unknown, signal?: AbortSignal) {
     recordPath(pathname);
     if (!value || typeof value !== 'object' || Array.isArray(value)) throw new SupabaseStorageError('السجل يجب أن يكون كائن بيانات.', 400);
     const body = JSON.stringify({owner:OWNER,pathname,payload:value,updated_at:new Date().toISOString()});
     if (new TextEncoder().encode(body).byteLength > MAX_RECORD_BYTES) throw new SupabaseStorageError('حجم السجل يتجاوز الحد المسموح.', 413);
-    const result = await supabaseFetch('/rest/v1/drast_records?on_conflict=owner,pathname', {method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body});
+    const result = await supabaseFetch('/rest/v1/drast_records?on_conflict=owner,pathname', {method:'POST',headers:{'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body,signal});
     requireSuccess(result, 'حفظ السجل');
   },
   async list(prefix: string) {
@@ -169,8 +169,16 @@ export const storage = {
     if (rows.length > MAX_LIST_ITEMS) throw new SupabaseStorageError('تجاوزت المساحة حد العرض الحالي؛ يلزم تفعيل التصفح المتدرج.');
     return rows.map((row: {pathname: string}) => recordPath(row.pathname));
   },
-  async head(pathname: string) {
-    const result = await supabaseFetch('/storage/v1/object/info/' + objectPath(pathname));
+  async archivePdf(pathname: string, bytes: Uint8Array, signal: AbortSignal) {
+    const body = new FormData();
+    body.append('file', new Blob([new Uint8Array(bytes)], {type:'application/pdf'}), 'report.pdf');
+    const result = await supabaseFetch('/storage/v1/object/' + objectPath(pathname), {
+      method:'POST', headers:{'x-upsert':'true'}, body, signal,
+    });
+    requireSuccess(result, 'استيراد ملف الإفصاح');
+  },
+  async head(pathname: string, signal?: AbortSignal) {
+    const result = await supabaseFetch('/storage/v1/object/info/' + objectPath(pathname), {signal});
     requireSuccess(result, 'قراءة بيانات الملف');
     const body: any = await result.json();
     const rawSize = body?.size ?? body?.metadata?.size;
@@ -207,3 +215,4 @@ export async function readBoundedRequestText(request: Request, maximumBytes: num
     return output + decoder.decode();
   } finally {reader.releaseLock();}
 }
+

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { PILOT_COMPANIES } from './pilot-catalog.mjs';
+import { researchIssuerIds } from './research-issuers.mjs';
 import { validateResearchJobPayload, type ResearchJob, type CloudJobSummary, type TaskStatus } from '../app/pilot-browser-store';
 import { storageReady, supabaseFetch, supabaseProjectRef, storageConfigurationMessage } from './supabase-storage';
 
@@ -9,7 +9,7 @@ export class ResearchCloudError extends Error {
 const ID=/^[a-zA-Z0-9-]{1,80}$/;
 const VERSION=/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const PAGE=20;
-const allowedCompanies=PILOT_COMPANIES.map(company=>company.id);
+const allowedCompanies=researchIssuerIds;
 function ownerKey(owner:string){if(!/^[a-zA-Z0-9_-]{1,128}$/.test(owner))throw new ResearchCloudError('مساحة غير مصرح بها.',403,'forbidden');return owner;}
 function jobKey(id:string){if(!ID.test(id))throw new ResearchCloudError('معرّف المهمة غير صالح.',400,'invalid_job');return id;}
 function versionKey(version:unknown){if(typeof version!=='string'||!VERSION.test(version))throw new ResearchCloudError('رقم النسخة السحابية غير صالح.',400,'invalid_version');return version;}
@@ -49,3 +49,4 @@ export function createResearchJobStore(dependencies:Partial<Dependencies>={}){
   return{status,list,read,save};
 }
 export const researchJobStore=createResearchJobStore();
+

@@ -100,3 +100,19 @@ test('JSON body reader enforces actual UTF-8 bytes even when Content-Length is a
  await assert.rejects(api.readBoundedRequestText(new Request('https://app.test',{method:'POST',headers:{'content-length':'1'},body:'س'.repeat(10)}),12),{status:413});
  await assert.rejects(api.readBoundedRequestText(new Request('https://app.test',{method:'POST',headers:{'content-length':'100'},body:'x'}),12),{status:413});
 });
+
+
+test('automatic import writes original PDF bytes to the private bucket',async t=>{
+ const bytes = new TextEncoder().encode('%PDF-original');
+ setup(t,async(url,init)=>{
+  assert.equal(url.pathname,`/storage/v1/object/${bucket}/${path}`);
+  assert.equal(init.method,'POST');
+  assert.equal(init.headers.get('x-upsert'),'true');
+  const file=init.body.get('file');
+  assert.equal(file.type,'application/pdf');
+  assert.deepEqual(new Uint8Array(await file.arrayBuffer()),bytes);
+  return Response.json({Key:path});
+ });
+ await api.storage.archivePdf(path,bytes,AbortSignal.timeout(1000));
+ await assert.rejects(api.storage.archivePdf('../file.pdf',bytes,AbortSignal.timeout(1000)));
+});

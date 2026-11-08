@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { collectedPdfRecord } from '../lib/finance/collected-pdf.mjs';
 import { collectCompanySources, validateSourceUrl } from '../lib/source-collector.mjs';
 import { getPilotCompany, isAllowedCompanySourceUrl, PILOT_COMPANIES } from '../lib/pilot-catalog.mjs';
 
@@ -18,8 +19,8 @@ function pdfFixture() {
   return parts.join('');
 }
 
-test('only the eight watchlist entities and exact approved HTTPS hosts are accepted', () => {
-  assert.deepEqual(PILOT_COMPANIES.map(item => item.id), ['hmg', 'aramco', 'sabic', 'stc', 'almarai', 'baan', 'kafd', 'humain']);
+test('only the configured watchlist entities and exact approved HTTPS hosts are accepted', () => {
+  assert.deepEqual(PILOT_COMPANIES.map(item => item.id), ['hmg', 'aramco', 'sabic', 'stc', 'almarai', 'baan', 'alrajhi', 'snb', 'kafd', 'humain']);
   const company = getPilotCompany('hmg');
   for (const url of ['http://hmg.com/report.pdf', 'https://hmg.com.evil.test/report.pdf', 'https://hmg.com@127.0.0.1/a', 'https://user:pass@hmg.com/a', 'https://hmg.com:8443/a', 'file:///etc/passwd', 'https://127.0.0.1/a']) {
     assert.throws(() => validateSourceUrl(url, company));
@@ -124,4 +125,65 @@ test('unrendered Angular variables are not treated as current financial evidence
   const result = await collectCompanySources('hmg', { fetchImpl: async () => htmlResponse(template) });
   assert.equal(result.evidence.length, 0);
   assert.ok(result.issues.some(issue => issue.includes('ديناميكيًا')));
+});
+
+
+test('approved statement import receives original bytes and gives each revision a stable identity', async () => {
+  const original = pdfFixture();
+  const imports = [];
+  const url = getPilotCompany('almarai').sourceUrls[1];
+  const result = await collectCompanySources('almarai', {
+    fetchImpl: async requested => requested === url ? new Response(original) : htmlResponse(reportHtml),
+    importPdf: async (company, source, bytes) => {
+      const allowed = new Set(['almarai']);
+      assert.equal(collectedPdfRecord(company, source, bytes, new Set()), null);
+      assert.equal(collectedPdfRecord(company, {...source,url:source.url + '?alternate'}, bytes, allowed), null);
+      const document = collectedPdfRecord(company, source, bytes, allowed);
+      assert.equal(document.period, '2026-Q3');
+      assert.equal(document.ticker, '2280');
+      assert.equal(document.pageCount, 1);
+      assert.equal(new TextDecoder().decode(bytes), original);
+      assert.equal(collectedPdfRecord(company, source, bytes, allowed).id, document.id);
+      assert.notEqual(collectedPdfRecord(company, source, new TextEncoder().encode(original + '\n'), allowed).id, document.id);
+      imports.push(document);
+      return true;
+    },
+  });
+  assert.equal(imports.length, 1, JSON.stringify(result.issues));
+  assert.ok(result.evidence.some(item => item.url === url));
+  assert.ok(result.issues.some(issue => issue.includes('استُورد')));
+});
+
+test('archive failure keeps source evidence available for drafting', async () => {
+  const result = await collectCompanySources('almarai', {
+    fetchImpl: async () => new Response(pdfFixture()),
+    importPdf: async () => { throw new Error('storage unavailable'); },
+  });
+  assert.ok(result.evidence.length > 0);
+  assert.ok(result.issues.some(issue => issue.includes('تعذّر استيراد')));
+});
+
+test('Al Rajhi research reads its public earnings release and rejects off-domain documents', async () => {
+  const bank = getPilotCompany('alrajhi');
+  const release = bank.sourceUrls[0];
+  assert.equal(bank.ticker,'1120');
+  const result = await collectCompanySources(bank.id, {fetchImpl: async url => {
+    if (url === release) return new Response(pdfFixture());
+    return htmlResponse(reportHtml.replace('</main>','<a href="https://objectstorage.me-jeddah-1.oraclecloud.com/restricted.pdf">Financial results Q3 2026</a></main>'));
+  }});
+  assert.ok(result.evidence.some(item=>item.url===release && item.kind==='pdf'));
+  assert.ok(result.evidence.every(item=>isAllowedCompanySourceUrl(bank.id,item.url)));
+});
+
+test('the official SNB statement is collected and recognized for existing ticker-based jobs', async () => {
+  const {getResearchConnector,allowedResearchEvidenceUrl}=await import('../lib/research-issuers.mjs');
+  const bank=getResearchConnector('listed-1180');
+  assert.equal(bank.id,'snb');
+  const statement=bank.sourceUrls[0];
+  const result=await collectCompanySources(bank.id,{
+    fetchImpl:async url=>url===statement ? new Response(pdfFixture()) : htmlResponse(reportHtml),
+  });
+  assert.ok(result.evidence.some(item=>item.url===statement&&item.kind==='pdf'));
+  assert.ok(allowedResearchEvidenceUrl('listed-1180',statement));
+  assert.equal(allowedResearchEvidenceUrl('listed-1120',statement),false);
 });

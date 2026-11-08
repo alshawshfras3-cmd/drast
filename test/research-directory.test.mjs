@@ -41,3 +41,20 @@ test('directory search finds major issuers by Arabic alias, English name and Ara
   assert.deepEqual(companies.filter(company => exactCompanyMatch(company,'۱۱۲۰')).map(company => company.ticker),['1120']);
   assert.ok(companies.some(company => company.ticker === '1120' && companyMatches(company,'Al Rajhi Bank')));
 });
+
+test('every listed issuer can create a bounded research request and private evidence stays issuer-scoped', async () => {
+  const {companies}=await read('listed-directory');
+  const {getResearchIssuer,libraryEvidence}=await import('../lib/research-issuers.mjs');
+  const {normalizeResearchRequest,validateEvidence}=await import('../lib/research-contract.mjs');
+  for (const company of companies) {
+    const id='listed-'+company.ticker;
+    assert.equal(normalizeResearchRequest({companyIds:[id]}).companyIds[0],id);
+  }
+  const issuer=getResearchIssuer('listed-1180');
+  const document={id:'250b425e-75aa-4e4d-85b7-61a31924dada',ticker:'1180',name:'Official filing',mime:'application/pdf',text:'This text was extracted from the private PDF filing.',createdAt:'2026-11-03'};
+  const evidence=libraryEvidence(issuer,document);
+  assert.equal(validateEvidence([evidence],[issuer.id])[0].url,'/api/documents?id='+document.id+'&download=true');
+  assert.equal(libraryEvidence(getResearchIssuer('listed-1120'),document),null);
+  assert.throws(()=>validateEvidence([{...evidence,url:'//example.com'+evidence.url}],[issuer.id]));
+  assert.throws(()=>normalizeResearchRequest({companyIds:['listed-0000']}));
+});

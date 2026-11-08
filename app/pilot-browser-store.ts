@@ -1,4 +1,4 @@
-import { isAllowedCompanySourceUrl } from '@/lib/pilot-catalog.mjs';
+import { allowedResearchEvidenceUrl } from '@/lib/research-issuers.mjs';
 
 /** Local research cache. Optional cloud transfers use the private server API. */
 export type ResearchType = 'results' | 'event' | 'sector';
@@ -89,7 +89,7 @@ export function validateResearchJobPayload(raw: unknown, allowedCompanies: strin
       || job.collectedCompanyIds.some(id => !job.companyIds.includes(id))
       || job.evidence.length > 9 || new Set(job.evidence.map(e => e?.id)).size !== job.evidence.length
       || job.evidence.reduce((total, e) => total + (typeof e?.text === 'string' ? e.text.length : 0), 0) > 180000
-      || job.evidence.some(e => !e || typeof e.id !== 'string' || typeof e.title !== 'string' || typeof e.text !== 'string' || e.text.length > 30000 || !e.text.trim() || typeof e.url !== 'string' || !isAllowedCompanySourceUrl(e.companyId, e.url) || !['html', 'pdf'].includes(e.kind) || !job.companyIds.includes(e.companyId) || !Number.isFinite(Date.parse(e.checkedAt)))
+      || job.evidence.some(e => !e || typeof e.id !== 'string' || typeof e.title !== 'string' || typeof e.text !== 'string' || e.text.length > 30000 || !e.text.trim() || typeof e.url !== 'string' || !allowedResearchEvidenceUrl(e.companyId, e.url) || !['html', 'pdf'].includes(e.kind) || !job.companyIds.includes(e.companyId) || !Number.isFinite(Date.parse(e.checkedAt)))
       || (job.editedText !== undefined && (typeof job.editedText !== 'string' || job.editedText.length > 300000))) throw new Error('تحتوي النسخة على مهمة غير صالحة؛ لم تُستورد أي بيانات.');
     if (job.report && (!['ai', 'sources_only'].includes(job.mode || '') || (job.status === 'ready' && job.mode !== 'ai') || (job.status === 'sources_only' && job.mode !== 'sources_only') || typeof job.report.title !== 'string' || typeof job.report.summary !== 'string' || !Array.isArray(job.report.sections)
       || job.report.sections.some(s => !s || typeof s.title !== 'string' || typeof s.body !== 'string' || !['fact', 'management', 'analysis', 'scenario'].includes(s.kind) || !Array.isArray(s.sourceIds) || !s.sourceIds.every(id => typeof id === 'string' && job.evidence.some(e => e.id === id)))
@@ -132,3 +132,4 @@ export async function fetchCloudJob(id:string):Promise<{job:ResearchJob;version:
 export async function uploadCloudJob(job:ResearchJob,expectedVersion:string|null):Promise<{id:string;version:string;updatedAt:string}>{
  return cloudResponse(await fetch('/api/research/jobs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({job,expectedVersion})}));
 }
+
