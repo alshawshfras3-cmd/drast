@@ -1,5 +1,9 @@
 # دراسات الشركات — تجربة الأبحاث الخاصة
 
+**English overview:** Drast is an early-stage, Saudi-focused financial research prototype. It organizes official company disclosures, tracks reviewable evidence, supports deterministic financial comparisons, and prepares source-linked research drafts that require human verification. The AI drafting step does not automatically turn extracted figures into approved financial facts.
+
+**For prospective contributors:** See [CONTRIBUTING.md](CONTRIBUTING.md) for setup checks, reporting guidance, and scope. This public repository does not yet have a project-wide open-source license; public visibility is not permission to redistribute code. Licensing is pending a separate ownership and dependency review.
+
 منصة عربية على Next.js / Vercel لجمع مصادر الشركات، إدارة مهام الأبحاث، تحرير المسودات ومقارنتها. المشروع `drast` مستقل عن أي مشروع آخر: لا مفاتيح أو قواعد بيانات أو واجهات لمشروع Badeeha، ولا ربط ببيانات نسخة Sites القديمة.
 
 ## النسخة الحالية
